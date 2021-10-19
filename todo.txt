@@ -1,4 +1,0 @@
--mines
--surface
--captain path tracker
--sprites

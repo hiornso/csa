@@ -7,7 +7,9 @@
 #include "accelerated.h"
 #include "csa_error.h"
 
+#ifndef OUTPUT_PNG
 #define OUTPUT_PNG 0
+#endif
 
 #define ITERS  50
 #define WIDTH  1000

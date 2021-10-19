@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=0.4.0
+Type=Application
+Terminal=false
+Exec=/usr/local/bin/captain-sonar-assist
+Name=Captain Sonar Assist
+Icon=/usr/share/icons/hicolor/scalable/apps/captain_sonar_assist.svg

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/builder">
+    <file compressed="true" preprocess="xml-stripblanks" alias="csa.ui">resources/builder/csa.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="menu.ui">resources/builder/menu.ui</file>
+  </gresource>
+  <gresource prefix="/images/engineering/pngs">
+    <file compressed="true" alias="nuclear25.png">resources/images/engineering/pngs/nuclear25.png</file>
+    <file compressed="true" alias="recon25.png">resources/images/engineering/pngs/recon25.png</file>
+    <file compressed="true" alias="weapons25.png">resources/images/engineering/pngs/weapons25.png</file>
+    <file compressed="true" alias="silence25.png">resources/images/engineering/pngs/silence25.png</file>
+  </gresource>
+  <gresource prefix="/images/first-mate/pngs">
+    <file compressed="true" alias="torpedo128.png">resources/images/first-mate/pngs/torpedo128.png</file>
+    <file compressed="true" alias="mine128.png">resources/images/first-mate/pngs/torpedo128.png</file>
+    <file compressed="true" alias="recon128.png">resources/images/first-mate/pngs/recon128.png</file>
+    <file compressed="true" alias="sonar128.png">resources/images/first-mate/pngs/sonar128.png</file>
+    <file compressed="true" alias="silence128.png">resources/images/first-mate/pngs/silence128.png</file>
+    <file compressed="true" alias="special128.png">resources/images/first-mate/pngs/silence128.png</file>
+  </gresource>
+  <gresource prefix="/images/logo">
+    <file compressed="true" alias="logo.png">resources/images/logo/logo.png</file>
+  </gresource>
+  <gresource prefix="/maps/builtins">
+    <!--Turn-Based-->
+    <file compressed="true" alias="Alpha">maps/alpha.lua</file>
+    <file compressed="true" alias="Bravo">maps/bravo.lua</file>
+    <file compressed="true" alias="Charlie">maps/charlie.lua</file>
+    <!--delta,echo-->
+    <file compressed="true" alias="Foxtrot">maps/foxtrot.lua</file>
+    <!--golf,hotel,india-->
+    <!--file compressed="true" alias="Juliet">maps/juliet.lua</file-->
+    <!--kilo,chicago,newyork-->
+    
+    <!--Real-Time-->
+    <file compressed="true" alias="Alpha RT">maps/alphaRT.lua</file>
+    <file compressed="true" alias="Bravo RT">maps/bravoRT.lua</file>
+    <file compressed="true" alias="Charlie RT">maps/charlieRT.lua</file>
+    <!--file compressed="true" alias="Delta RT">maps/deltaRT.lua</file-->
+    <!--echo-->
+    <file compressed="true" alias="Foxtrot RT">maps/foxtrotRT.lua</file>
+    <!--golf,hotel,india-->
+    <file compressed="true" alias="Juliet RT">maps/julietRT.lua</file>
+    <!--kilo,chicago-->
+    <file compressed="true" alias="New York RT">maps/newyorkRT.lua</file>
+  </gresource>
+  <gresource prefix="/maps">
+    <file compressed="true" alias="csa_base">maps/base.lua</file>
+  </gresource>
+</gresources>

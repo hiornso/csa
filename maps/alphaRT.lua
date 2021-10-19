@@ -1,0 +1,38 @@
+require("csa_base")
+unpack()
+
+illegal = {
+	COORDS(C,2),
+	COORDS(G,2),
+	COORDS(M,2),
+	COORDS(N,2),
+	COORDS(C,3),
+	COORDS(I,3),
+	COORDS(M,3),
+	COORDS(I,4),
+	COORDS(B,7),
+	COORDS(D,7),
+	COORDS(G,7),
+	COORDS(I,7),
+	COORDS(B,8),
+	COORDS(D,8),
+	COORDS(G,8),
+	COORDS(D,9),
+	COORDS(H,9),
+	COORDS(L,9),
+	COORDS(M,9),
+	COORDS(N,9),
+	COORDS(D,11),
+	COORDS(C,12),
+	COORDS(H,12),
+	COORDS(L,12),
+	COORDS(A,13),
+	COORDS(M,13),
+	COORDS(C,14),
+	COORDS(G,14),
+	COORDS(I,14),
+	COORDS(N,14),
+	COORDS(D,15),
+}
+
+init_csa()

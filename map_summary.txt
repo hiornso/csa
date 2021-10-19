@@ -1,0 +1,24 @@
+Alpha
+Bravo
+Charlie
+Delta: Ice (safe surface) +surface damage check
+Echo: [public mines]
+
+Foxtrot
+
+Golf: Archer Bases +enemy at archer base func
+Hotel: {Hotels, doesn't affect tracking, only rendering}
+India: Shallows +move damage check
+Juliet
+Kilo: Currents +move damage check
+
+Chicago
+New York
+
+Oh Captain: Role adding base thingies [only realtime] +enemy at role adding base thingy check (identical to archer bases)
+Armada: Subvehicles = helicopter, cruiser
+Stations: Stations [see essay]
+E.M.P.: EMP zones
+Vortex: vortices +vortexed check upon move
+Blackout: blackout zones
+Volcano: land formation

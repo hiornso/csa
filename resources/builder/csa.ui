@@ -1,0 +1,1692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkBox" id="rootbox">
+    <property name="can-focus">0</property>
+    <property name="orientation">vertical</property>
+    <child>
+      <object class="GtkNotebook">
+        <property name="vexpand">1</property>
+        <property name="scrollable">1</property>
+        <property name="enable-popup">1</property>
+        <child>
+          <object class="GtkNotebookPage">
+            <property name="child">
+              <object class="GtkGrid">
+                <property name="can-focus">0</property>
+                <property name="vexpand">1</property>
+                <child>
+                  <object class="GtkGrid" id="captain_map_builtin_button_grid">
+                    <property name="can-focus">0</property>
+                    <property name="column-homogeneous">1</property>
+                    <property name="sensitive">false</property>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="height-request">10</property>
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">4</property>
+                          <property name="column-span">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="captain_south">
+                        <property name="label" translatable="yes">South</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="captain_west">
+                        <property name="label" translatable="yes">West</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="captain_surface">
+                        <property name="label" translatable="yes">Surface</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="captain_east">
+                        <property name="label" translatable="yes">East</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="captain_north">
+                        <property name="label" translatable="yes">North</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="height-request">10</property>
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">0</property>
+                          <property name="column-span">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="captain_map_dropdown">
+                    <property name="can-focus">0</property>
+                    <property name="button-sensitivity">on</property>
+                    <items>
+                      <item translatable="yes">Open From File</item>
+                    </items>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="vexpand">1</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="child">
+                      <object class="GtkViewport">
+                        <property name="can-focus">0</property>
+                        <property name="child">
+                          <object class="GtkBox" id="captain_map_ui_box">
+                            <property name="can-focus">0</property>
+                            <property name="vexpand">1</property>
+                            <property name="orientation">vertical</property>
+                            <property name="sensitive">false</property>
+                          </object>
+                        </property>
+                      </object>
+                    </property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkNotebook">
+                    <property name="hexpand">1</property>
+                    <child>
+                      <object class="GtkNotebookPage">
+                        <property name="child">
+                          <object class="GtkDrawingArea" id="captain_drawing_area">
+                            <property name="can-focus">0</property>
+                          </object>
+                        </property>
+                        <property name="tab">
+                          <object class="GtkLabel">
+                            <property name="can-focus">0</property>
+                            <property name="label" translatable="yes">Course Plotter</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkNotebookPage">
+                        <property name="position">1</property>
+                        <property name="child">
+                          <object class="GtkDrawingArea" id="captain_self_tracking">
+                            <property name="can-focus">0</property>
+                          </object>
+                        </property>
+                        <property name="tab">
+                          <object class="GtkLabel">
+                            <property name="can-focus">0</property>
+                            <property name="label" translatable="yes">Self-tracking</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">0</property>
+                      <property name="row-span">3</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </property>
+            <property name="tab">
+              <object class="GtkLabel">
+                <property name="can-focus">0</property>
+                <property name="label" translatable="yes">Captain</property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkNotebookPage">
+            <property name="position">1</property>
+            <property name="child">
+              <object class="GtkBox">
+                <property name="can-focus">0</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkComboBoxText" id="first_mate_special_dropdown">
+                    <property name="height-request">30</property>
+                    <property name="can-focus">0</property>
+                    <property name="active">0</property>
+                    <items>
+                      <item translatable="yes">Kraken Missile</item>
+                      <item translatable="yes">Kaos Polarizing Mine</item>
+                      <item translatable="yes">ASGARD Super-Cavitation Torpedo</item>
+                      <item translatable="yes">Hacking System</item>
+                      <item translatable="yes">MINOS Countermeasures System</item>
+                      <item translatable="yes">Ulysses Repair System</item>
+                      <item translatable="yes">Kraken Missile (RT)</item>
+                      <item translatable="yes">Kaos Polarizing Mine (RT)</item>
+                      <item translatable="yes">ASGARD Super-Cavitation Torpedo (RT)</item>
+                      <item translatable="yes">Hacking System (RT)</item>
+                      <item translatable="yes">MINOS Countermeasures System (RT)</item>
+                      <item translatable="yes">Ulysses Repair System (RT)</item>
+                    </items>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkGrid">
+                    <property name="vexpand">1</property>
+                    <property name="can-focus">0</property>
+                    <property name="margin-top">10</property>
+                    <property name="margin-bottom">10</property>
+                    <property name="row-homogeneous">1</property>
+                    <property name="column-homogeneous">1</property>
+                    <property name="row-spacing">5</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="can-focus">0</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="resource">/images/first-mate/pngs/torpedo128.png</property>
+                            <property name="pixel-size">128</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLevelBar" id="first_mate_torpedo_levelbar">
+                            <property name="height-request">30</property>
+                            <property name="can-focus">0</property>
+                            <property name="max-value">2</property>
+                            <property name="mode">discrete</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_torpedo_charge_button">
+                            <property name="label" translatable="yes">Charge</property>
+                            <property name="receives-default">1</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_torpedo_use_button">
+                            <property name="label" translatable="yes">Use</property>
+                            <property name="receives-default">1</property>
+                            <property name="sensitive">0</property>
+                          </object>
+                        </child>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="can-focus">0</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="resource">/images/first-mate/pngs/mine128.png</property>
+                            <property name="pixel-size">128</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLevelBar" id="first_mate_mine_levelbar">
+                            <property name="height-request">30</property>
+                            <property name="can-focus">0</property>
+                            <property name="max-value">2</property>
+                            <property name="mode">discrete</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_mine_charge_button">
+                            <property name="label" translatable="yes">Charge</property>
+                            <property name="receives-default">1</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_mine_use_button">
+                            <property name="label" translatable="yes">Use</property>
+                            <property name="receives-default">1</property>
+                            <property name="sensitive">0</property>
+                          </object>
+                        </child>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="can-focus">0</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="resource">/images/first-mate/pngs/recon128.png</property>
+                            <property name="pixel-size">128</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLevelBar" id="first_mate_drone_levelbar">
+                            <property name="height-request">30</property>
+                            <property name="can-focus">0</property>
+                            <property name="max-value">3</property>
+                            <property name="mode">discrete</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_drone_charge_button">
+                            <property name="label" translatable="yes">Charge</property>
+                            <property name="receives-default">1</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_drone_use_button">
+                            <property name="label" translatable="yes">Use</property>
+                            <property name="receives-default">1</property>
+                            <property name="sensitive">0</property>
+                          </object>
+                        </child>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="can-focus">0</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="resource">/images/first-mate/pngs/sonar128.png</property>
+                            <property name="pixel-size">128</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLevelBar" id="first_mate_sonar_levelbar">
+                            <property name="height-request">30</property>
+                            <property name="can-focus">0</property>
+                            <property name="max-value">2</property>
+                            <property name="mode">discrete</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_sonar_charge_button">
+                            <property name="label" translatable="yes">Charge</property>
+                            <property name="receives-default">1</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_sonar_use_button">
+                            <property name="label" translatable="yes">Use</property>
+                            <property name="receives-default">1</property>
+                            <property name="sensitive">0</property>
+                          </object>
+                        </child>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="can-focus">0</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="resource">/images/first-mate/pngs/silence128.png</property>
+                            <property name="pixel-size">128</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLevelBar" id="first_mate_silence_levelbar">
+                            <property name="height-request">30</property>
+                            <property name="can-focus">0</property>
+                            <property name="max-value">5</property>
+                            <property name="mode">discrete</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_silence_charge_button">
+                            <property name="label" translatable="yes">Charge</property>
+                            <property name="receives-default">1</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_silence_use_button">
+                            <property name="label" translatable="yes">Use</property>
+                            <property name="receives-default">1</property>
+                            <property name="sensitive">0</property>
+                          </object>
+                        </child>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="can-focus">0</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="resource">/images/first-mate/pngs/special128.png</property>
+                            <property name="pixel-size">128</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLevelBar" id="first_mate_special_levelbar">
+                            <property name="height-request">30</property>
+                            <property name="can-focus">0</property>
+                            <property name="max-value">3</property>
+                            <property name="mode">discrete</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_special_charge_button">
+                            <property name="label" translatable="yes">Charge</property>
+                            <property name="receives-default">1</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="first_mate_special_use_button">
+                            <property name="label" translatable="yes">Use</property>
+                            <property name="receives-default">1</property>
+                            <property name="sensitive">0</property>
+                          </object>
+                        </child>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </property>
+            <property name="tab">
+              <object class="GtkLabel">
+                <property name="can-focus">0</property>
+                <property name="label" translatable="yes">First Mate</property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkNotebookPage">
+            <property name="position">2</property>
+            <property name="child">
+              <object class="GtkBox">
+                <property name="can-focus">0</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="can-focus">0</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="margin-top">7</property>
+                        <property name="hexpand">1</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="can-focus">0</property>
+                            <property name="label" translatable="yes">West</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_1_weapons_1">
+                            <property name="receives-default">1</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 1: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#000000000000"></attribute>
+                                      <attribute name="background" value="#9090cacaf9f9"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Weapons</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/weapons25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_1_silence">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 1: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#000000000000"></attribute>
+                                      <attribute name="background" value="#9090cacaf9f9"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Silence</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/silence25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_1_recon">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 1: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#000000000000"></attribute>
+                                      <attribute name="background" value="#9090cacaf9f9"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Recon</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/recon25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_recon_1">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Recon</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/recon25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_nuclear_1">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Nuclear</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/nuclear25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_nuclear_2">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Nuclear</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/nuclear25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator">
+                            <property name="can-focus">0</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="margin-top">7</property>
+                        <property name="hexpand">1</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="can-focus">0</property>
+                            <property name="label" translatable="yes">South</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_2_silence_1">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 2: </property>
+                                    <attributes>
+                                      <attribute name="background" value="#19197676d2d2"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Silence</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/silence25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_2_silence_2">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 2: </property>
+                                    <attributes>
+                                      <attribute name="background" value="#19197676d2d2"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Silence</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/silence25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_2_weapons">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 2: </property>
+                                    <attributes>
+                                      <attribute name="background" value="#19197676d2d2"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Weapons</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/weapons25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_recon_2">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Recon</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/recon25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_weapons_1">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Weapons</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/weapons25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_nuclear_3">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Nuclear</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/nuclear25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator">
+                            <property name="can-focus">0</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="margin-top">7</property>
+                        <property name="hexpand">1</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="can-focus">0</property>
+                            <property name="label" translatable="yes">North</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_3_recon">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 3: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#fff"></attribute>
+                                      <attribute name="background" value="#0d0d4747a1a1"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Recon</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/recon25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_3_silence_1">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 3: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#fff"></attribute>
+                                      <attribute name="background" value="#0d0d4747a1a1"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Silence</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/silence25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_3_weapons">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 3: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#fff"></attribute>
+                                      <attribute name="background" value="#0d0d4747a1a1"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Weapons</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/weapons25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_weapons_2">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Weapons</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/weapons25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_nuclear_4">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Nuclear</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/nuclear25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_silence">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Silence</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/silence25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator">
+                            <property name="can-focus">0</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="can-focus">0</property>
+                        <property name="halign">center</property>
+                        <property name="margin-top">7</property>
+                        <property name="hexpand">1</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="can-focus">0</property>
+                            <property name="label" translatable="yes">East</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_1_weapons_2">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 1: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#000000000000"></attribute>
+                                      <attribute name="background" value="#9090cacaf9f9"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Weapons</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/weapons25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_2_recon">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 2: </property>
+                                    <attributes>
+                                      <attribute name="background" value="#19197676d2d2"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Recon</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/recon25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_3_silence_2">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes"> Subsystem 3: </property>
+                                    <attributes>
+                                      <attribute name="foreground" value="#fff"></attribute>
+                                      <attribute name="background" value="#0d0d4747a1a1"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Silence</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/silence25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_nuclear_5">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Nuclear</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/nuclear25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_recon_3">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Recon</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/recon25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="engineer_nuclear_6">
+                            <property name="receives-default">1</property>                            <child>
+                              <object class="GtkBox">
+                                <property name="can-focus">0</property>
+                                <property name="spacing">5</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">No Subsystem:</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="can-focus">0</property>
+                                    <property name="label" translatable="yes">Nuclear</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="can-focus">0</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">1</property>
+                                    <property name="resource">/images/engineering/pngs/nuclear25.png</property>
+                                    <property name="pixel-size">25</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator">
+                            <property name="can-focus">0</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="engineer_surface_button">
+                    <property name="label" translatable="yes">Surface</property>
+                    <property name="receives-default">1</property>
+                    <property name="valign">end</property>
+                    <property name="margin-start">50</property>
+                    <property name="margin-end">50</property>
+                    <property name="margin-top">15</property>
+                  </object>
+                </child>
+              </object>
+            </property>
+            <property name="tab">
+              <object class="GtkLabel">
+                <property name="can-focus">0</property>
+                <property name="label" translatable="yes">Engineer</property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkNotebookPage">
+            <property name="position">3</property>
+            <property name="child">
+              <object class="GtkGrid">
+                <property name="can-focus">0</property>
+                <property name="vexpand">1</property>
+                <child>
+                  <object class="GtkGrid" id="radio_engineer_map_builtin_button_grid">
+                    <property name="can-focus">0</property>
+                    <property name="column-homogeneous">1</property>
+                    <property name="sensitive">false</property>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="height-request">10</property>
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">4</property>
+                          <property name="column-span">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="radio_engineer_south">
+                        <property name="label" translatable="yes">South</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="radio_engineer_west">
+                        <property name="label" translatable="yes">West</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="radio_engineer_surface">
+                        <property name="label" translatable="yes">Surface</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="radio_engineer_east">
+                        <property name="label" translatable="yes">East</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">2</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="radio_engineer_north">
+                        <property name="label" translatable="yes">North</property>
+                        <property name="receives-default">1</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator">
+                        <property name="height-request">10</property>
+                        <property name="can-focus">0</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">0</property>
+                          <property name="column-span">3</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="radio_engineer_map_dropdown">
+                    <property name="can-focus">0</property>
+                    <property name="button-sensitivity">on</property>
+                    <items>
+                      <item translatable="yes">Open From File</item>
+                    </items>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="vexpand">1</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="child">
+                      <object class="GtkViewport">
+                        <property name="can-focus">0</property>
+                        <property name="child">
+                          <object class="GtkBox" id="radio_engineer_map_ui_box">
+                            <property name="can-focus">0</property>
+                            <property name="vexpand">1</property>
+                            <property name="orientation">vertical</property>
+                          </object>
+                        </property>
+                      </object>
+                    </property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkDrawingArea" id="radio_engineer_drawing_area">
+                    <property name="can-focus">0</property>
+                    <property name="hexpand">1</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">0</property>
+                      <property name="row-span">3</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </property>
+            <property name="tab">
+              <object class="GtkLabel">
+                <property name="can-focus">0</property>
+                <property name="label" translatable="yes">Radio Engineer</property>
+              </object>
+            </property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkOverlay">
+        <property name="can-focus">0</property>
+        <property name="child">
+          <object class="GtkBox">
+            <property name="can-focus">0</property>
+            <child>
+              <object class="GtkBox">
+                <property name="can-focus">0</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="can-focus">0</property>
+                    <property name="margin-start">4</property>
+                    <property name="margin-end">4</property>
+                    <property name="label" translatable="yes">Enemy Health:</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="enemy_health_minus">
+                    <property name="label" translatable="yes">-</property>
+                    <property name="receives-default">1</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLevelBar" id="enemy_health_bar">
+                    <property name="can-focus">0</property>
+                    <property name="value">4</property>
+                    <property name="max-value">4</property>
+                    <property name="mode">discrete</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="enemy_health_plus">
+                    <property name="label" translatable="yes">+</property>
+                    <property name="receives-default">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="hexpand">1</property>
+                <property name="width-request">200</property>
+                <property name="can-focus">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="can-focus">0</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="can-focus">0</property>
+                    <property name="margin-start">4</property>
+                    <property name="margin-end">4</property>
+                    <property name="label" translatable="yes">Player Health:</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="player_health_minus">
+                    <property name="label" translatable="yes">-</property>
+                    <property name="receives-default">1</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLevelBar" id="player_health_bar">
+                    <property name="can-focus">0</property>
+                    <property name="value">4</property>
+                    <property name="max-value">4</property>
+                    <property name="mode">discrete</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="player_health_plus">
+                    <property name="label" translatable="yes">+</property>
+                    <property name="receives-default">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+  </object>
+</interface>

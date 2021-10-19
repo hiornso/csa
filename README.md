@@ -39,4 +39,5 @@ Further build customisation:
 There are some other settings available in the makefile, but messing with them will likely break things unless you know what you're doing - if you want to learn how to use them, I'd recommend looking at the Makefile.
 
 How to use CSA:
+
 Run the executable, load a map using the dropdown, enter all actions by yourself or your opponent... (A proper manual is on the to-do list).

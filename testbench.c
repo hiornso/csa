@@ -27,6 +27,7 @@ int main()
 	Omni data;
 	data.gui_elems.radio_engineer_drawing_area = (void*)((long long)NULL + 1LL); // to make draw select captain tracker
 	data.gui_elems.captain_drawing_area = dummy; // make it do course plotter, we don't care about the rendering of the dots, just the map
+	data.course_plotter.position_history = NULL; // register no positions whatsoever - effectively we are rendering the map before they have chosen a starting position
 	
 	if(init_tracker(&data, "maps/testbench.lua", FROM_FILE, TRUE)){ // make a "captain tracker"
 		csa_error("an error occurred in init_tracker.\n");
@@ -46,7 +47,6 @@ int main()
 		cairo_paint(cr);
 		cairo_restore(cr);
 		cairo_save(cr);
-		
 		draw((GtkDrawingArea*)dummy, cr, width, height, &data);
 		data.captain_tracker->mrc.old_res = -1;
 	}

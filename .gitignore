@@ -7,5 +7,4 @@ resources.c
 osheader.h
 resources/builder/menu.ui
 obj/**
-vcl
 Captain Sonar Assist.app

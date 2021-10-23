@@ -9,7 +9,7 @@ CSA (Captain Sonar Assist) is a tool to assist in winning games of Captain Sonar
 **Dependencies:**
 - gtk4 (https://www.gtk.org/)
 - luajit (https://luajit.org/)
-- vcl (https://github.com/vectorclass/version2 - this is currently included in a zip file and is extracted by the makefile when the relevant build variable is set to enable use of SSE vectorisation)
+- VCL (https://github.com/vectorclass/version2 - this is a submodule which is automatically initialised by the makefile when the relevant build variable is set to enable use of SSE vectorisation)
 - lrzip (https://github.com/ckolivas/lrzip - only needed if you intend to create distributions compressed using `lrzip`)
 
 **To build:**
@@ -48,8 +48,8 @@ Most of these will not need to be modified - the Makefile is designed to make se
 - `DISTRIB_DIR=distrib make distrib` specifies the directory in which to put the created distributions when creating them with `make distrib`. Result: sets the directory to put created distributions in. Default: `distrib`
 - `DISTRIB_FILENAME=$(shell date +"csa_%F_%H-%M-%S") make distrib` specifies the name of the created distribution archive (to which an extension will be added corresponding to the type of compression). Result: sets the name of the distribution file. Default: `$(shell date +"csa_%F_%H-%M-%S")` (generates a name like `csa_2021-05-13_23-30-45` for example, if the date and time was 23:30:45 on 2021-05-13, to which a suffix of `.tar.gz`/`.tar.lrz` will be appended when creating the relevant distribution)
 - `MACOS_APP_NAME=Captain\ Sonar\ Assist.app make` specifies the name of the app bundle to be created when compiling on MacOS (this is created in addition to the executable itself). Result: sets the name of the app bundle on MacOS. Default: `Captain Sonar Assist.app`
-- `UNZIP=unzip TAR=tar LRZIP=lrzip make` specifies the programs to be used for unzipping (used when extracting VCL), tarring (done when creating any distribution archives) and lrzipping (done when creating `.tar.lrz` distribution archives specifically). On MacOS/BSD, `gtar` must be used rather than `tar` so that the `--transform` switch is available (used to format paths in the distribution archives correctly during creation) - `gtar` is used automatically when MacOS is detected.
-There are some other settings available in the makefile, but messing with them will likely break things unless you know what you're doing - if you want to learn how to use them, I'd recommend looking at the Makefile.
+- `TAR=tar LRZIP=lrzip make` specifies the programs to be used for tarring (done when creating any distribution archives) and lrzipping (done when creating `.tar.lrz` distribution archives specifically). On MacOS/BSD, `gtar` must be used rather than `tar` so that the `--transform` switch is available (used to format paths in the distribution archives correctly during creation) - `gtar` is used automatically when MacOS is detected.
+There are some other settings available in the Makefile, but messing with them will likely break things unless you know what you're doing - if you want to learn how to use them, I'd recommend looking at the source.
 
 **How to use CSA:**
 

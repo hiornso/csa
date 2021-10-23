@@ -2,7 +2,6 @@ CC?=cc
 CXX?=c++
 
 PKGCONFIG?=pkg-config
-UNZIP?=unzip
 
 USE_VCL?=0
 USE_LTO?=0
@@ -113,7 +112,7 @@ $(OBJDIR)/csa_error.o: $(OBJDIR) csa_error.c csa_error.h
 
 $(OBJDIR)/accelerated.o: $(OBJDIR) accelerated.cpp accelerated.h main.h csa_alloc.h tracker.h
 ifeq ($(USE_VCL),1)
-	$(UNZIP) vcl.zip
+	git submodule update --init
 endif
 	$(CXX) $(CXXFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -DUSE_VECTORS=$(USE_VCL) -c -o $(OBJDIR)/accelerated.o accelerated.cpp
 
@@ -150,7 +149,6 @@ $(OBJDIR)/testbench.o: $(OBJDIR) testbench.c main.h csa_alloc.h tracker.h accele
 .PHONY: clean
 clean:
 	rm -f csa testbench testbench.png resources.c resources/builder/menu.ui $(OBJDIR)/*
-	rm -rf vcl
 ifeq ($(OS),Darwin)
 	rm -rf $(MACOS_APP_NAME)
 endif

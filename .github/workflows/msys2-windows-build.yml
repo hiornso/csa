@@ -42,7 +42,10 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: csa_testbench
-          path: .
+      
+      - name: Display artifact structure
+        run: |
+          ls -R
       
       - name: Benchmark
         run: |

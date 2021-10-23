@@ -34,6 +34,9 @@ jobs:
         with:
           name: csa_testbench
           path: testbench.exe
+      
+      - name: Benchmark
+        run: .\testbench.exe
 
   benchmark:
     runs-on: windows-latest

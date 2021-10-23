@@ -34,13 +34,13 @@ jobs:
         with:
           name: csa_testbench
           path: testbench.exe
-      
-      - name: Benchmark
-        run: ./testbench
 
   benchmark:
     runs-on: windows-latest
     needs: build
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
       - uses: msys2/setup-msys2@v2
         with:
@@ -51,10 +51,6 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: csa_testbench
-      
-      - name: Display artifact structure
-        run: |
-          ls -R
       
       - name: Benchmark
         run: |

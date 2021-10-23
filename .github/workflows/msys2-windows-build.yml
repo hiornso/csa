@@ -30,8 +30,8 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtk4 mingw-w64-x86_64-luajit
+          install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtk4 mingw-w64-x86_64-luajit
 
       - name: Build
         run: |
-          make
+          mingw32-make

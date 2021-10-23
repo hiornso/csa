@@ -39,4 +39,4 @@ jobs:
     steps:
       - name: Benchmark
         run: |
-          .\testbench
+          .\testbench.exe

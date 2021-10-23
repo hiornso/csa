@@ -36,7 +36,7 @@ jobs:
           path: testbench.exe
       
       - name: Benchmark
-        run: .\testbench.exe
+        run: ./testbench
 
   benchmark:
     runs-on: windows-latest
@@ -58,4 +58,4 @@ jobs:
       
       - name: Benchmark
         run: |
-          .\testbench.exe
+          ./testbench

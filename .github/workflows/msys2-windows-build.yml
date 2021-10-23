@@ -28,15 +28,22 @@ jobs:
       
       - uses: actions/upload-artifact@v2
         with:
-          name: executables
-          path: |
-            csa.exe
-            testbench.exe
+          name: csa_executable
+          path: csa.exe
+      - uses: actions/upload-artifact@v2
+        with:
+          name: csa_testbench
+          path: testbench.exe
 
   benchmark:
     runs-on: windows-latest
     needs: build
     steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: csa_testbench
+          path: .
+      
       - name: Benchmark
         run: |
           .\testbench.exe

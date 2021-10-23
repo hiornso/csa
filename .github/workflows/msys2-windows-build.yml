@@ -35,3 +35,8 @@ jobs:
       - name: Build
         run: |
           mingw32-make
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Executable
+          path: csa.exe

@@ -26,18 +26,23 @@ jobs:
         env:
           CC: clang
           CXX: clang++
+          
+      - name: Archive
+        run: |
+          tar -cf csa.tar csa
+          tar -cf testbench.tar testbench
       
       - name: Upload executable
         uses: actions/upload-artifact@v2
         with:
           name: csa-linux
-          path: csa
+          path: csa.tar
       
       - name: Upload test executable
         uses: actions/upload-artifact@v2
         with:
           name: csa-testbench-linux
-          path: testbench
+          path: testbench.tar
 
   test-linux:
     runs-on: ubuntu-latest
@@ -57,10 +62,11 @@ jobs:
         with:
           name: csa-testbench-linux
       
+      - name: Extract test executable
+        run: tar -xf testbench.tar
+      
       - name: Run tests
-        run: |
-          chmod +x testbench
-          ./testbench
+        run: ./testbench
   
   build-macos:
     runs-on: macos-latest
@@ -79,17 +85,22 @@ jobs:
           CC: clang
           CXX: clang++
       
+      - name: Archive
+        run: |
+          tar -cf Captain\ Sonar\ Assist.app.tar Captain\ Sonar\ Assist.app
+          tar -cf testbench.tar testbench
+      
       - name: Upload executable
         uses: actions/upload-artifact@v2
         with:
           name: csa-macos
-          path: Captain Sonar Assist.app
+          path: Captain Sonar Assist.app.tar
       
       - name: Upload test executable
         uses: actions/upload-artifact@v2
         with:
           name: csa-testbench-macos
-          path: testbench
+          path: testbench.tar
 
   test-macos:
     runs-on: macos-latest
@@ -107,11 +118,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: csa-testbench-macos
+          
+      - name: Extract test executable
+        run: tar -xf testbench.tar
       
       - name: Run tests
-        run: |
-          chmod +x testbench
-          ./testbench
+        run: ./testbench
   
   build-windows:
     runs-on: windows-latest

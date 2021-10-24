@@ -1,4 +1,4 @@
-name: Windows-CI
+name: Build and test
 
 on:
   push:
@@ -9,50 +9,164 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+      - run: |
+        apt update
+        apt install clang make pkg-config libgtk-4-dev libluajit-5.1-dev
+      
+      - name: Set compilers
+      - run: |
+        export CC=clang
+        export CXX=clang++
+
+      - name: Build
+        run: |
+          make all
+      
+      - name: Upload executable
+      - uses: actions/upload-artifact@v2
+        with:
+          name: csa-linux
+      - name: Upload test executable
+      - uses: actions/upload-artifact@v2
+        with:
+          name: csa-testbench-linux
+          path: testbench
+
+  test-linux:
+    runs-on: ubuntu-latest
+    needs: build-linux
+    steps:
+      - name: Checkout repo
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+      - run: |
+        apt update
+        apt install libgtk-4-dev libluajit-5.1-dev
+      
+      - name: Download test executable
+      - uses: actions/download-artifact@v2
+        with:
+          name: csa-testbench-linux
+      
+      - name: Run tests
+        run: |
+          ./testbench
+  
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+      - run: |
+        gtk4
+        luajit
+            
+      - name: Set compilers
+      - run: |
+        export CC=clang
+        export CXX=clang++
+
+      - name: Build
+        run: |
+          make all
+      
+      - name: Upload executable
+      - uses: actions/upload-artifact@v2
+        with:
+          name: csa-macos
+          path: Captain Sonar Assist.app
+      - name: Upload test executable
+      - uses: actions/upload-artifact@v2
+        with:
+          name: csa-testbench-macos
+          path: testbench
+
+  test-macos:
+    runs-on: macos-latest
+    needs: build-macos
+    steps:
+      - name: Checkout repo
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+      - run: |
+        gtk4
+        luajit
+      
+      - name: Download test executable
+      - uses: actions/download-artifact@v2
+        with:
+          name: csa-testbench-macos
+      
+      - name: Run tests
+        run: |
+          ./testbench
+  
+  build-windows:
     runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
     steps:
+      - name: Checkout repo
       - uses: actions/checkout@v2
+      - name: Install MSYS2
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           update: true
-          install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtk4 mingw-w64-x86_64-luajit
+          install: |
+            mingw-w64-x86_64-clang
+            mingw-w64-x86_64-gtk4
+            mingw-w64-x86_64-luajit
+            
+      - name: Set compilers
+      - run: |
+        export CC=clang
+        export CXX=clang++
 
       - name: Build
         run: |
           mingw32-make all
       
+      - name: Upload executable
       - uses: actions/upload-artifact@v2
         with:
-          name: csa_executable
+          name: csa-windows
           path: csa.exe
+      - name: Upload test executable
       - uses: actions/upload-artifact@v2
         with:
-          name: csa_testbench
+          name: csa-testbench-windows
           path: testbench.exe
 
-  benchmark:
+  test-windows:
     runs-on: windows-latest
-    needs: build
+    needs: build-windows
     defaults:
       run:
         shell: msys2 {0}
     steps:
+      - name: Checkout repo
       - uses: actions/checkout@v2
+      - name: Install MSYS2
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           update: true
           install: mingw-w64-x86_64-gtk4 mingw-w64-x86_64-luajit
       
+      - name: Download test executable
       - uses: actions/download-artifact@v2
         with:
-          name: csa_testbench
+          name: csa-testbench-windows
       
-      - name: Benchmark
+      - name: Run tests
         run: |
           ./testbench

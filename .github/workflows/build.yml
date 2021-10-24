@@ -14,18 +14,20 @@ jobs:
     steps:
       - name: Checkout repo
       - uses: actions/checkout@v2
+      
       - name: Install dependencies
       - run: |
           apt update
           apt install clang make pkg-config libgtk-4-dev libluajit-5.1-dev
       
       - name: Build
-        run: CC=clang CXX=clang++ make all
+      - run: CC=clang CXX=clang++ make all
       
       - name: Upload executable
       - uses: actions/upload-artifact@v2
         with:
           name: csa-linux
+      
       - name: Upload test executable
       - uses: actions/upload-artifact@v2
         with:
@@ -38,6 +40,7 @@ jobs:
     steps:
       - name: Checkout repo
       - uses: actions/checkout@v2
+      
       - name: Install dependencies
       - run: |
           apt update
@@ -49,24 +52,26 @@ jobs:
           name: csa-testbench-linux
       
       - name: Run tests
-        run: ./testbench
+      - run: ./testbench
   
   build-macos:
     runs-on: macos-latest
     steps:
       - name: Checkout repo
       - uses: actions/checkout@v2
+      
       - name: Install dependencies
       - run: HOMEBREW_NO_AUTO_UPDATE=1 brew install gtk4 luajit
             
       - name: Build
-        run: CC=clang CXX=clang++ make all
+      - run: CC=clang CXX=clang++ make all
       
       - name: Upload executable
       - uses: actions/upload-artifact@v2
         with:
           name: csa-macos
           path: Captain Sonar Assist.app
+      
       - name: Upload test executable
       - uses: actions/upload-artifact@v2
         with:
@@ -79,6 +84,7 @@ jobs:
     steps:
       - name: Checkout repo
       - uses: actions/checkout@v2
+      
       - name: Install dependencies
       - run: HOMEBREW_NO_AUTO_UPDATE=1 brew install gtk4 luajit
       
@@ -88,7 +94,7 @@ jobs:
           name: csa-testbench-macos
       
       - name: Run tests
-        run: ./testbench
+      - run: ./testbench
   
   build-windows:
     runs-on: windows-latest
@@ -98,6 +104,7 @@ jobs:
     steps:
       - name: Checkout repo
       - uses: actions/checkout@v2
+      
       - name: Install MSYS2
       - uses: msys2/setup-msys2@v2
         with:
@@ -109,13 +116,14 @@ jobs:
             mingw-w64-x86_64-luajit
             
       - name: Build
-        run: CC=clang CXX=clang++ mingw32-make all
+      - run: CC=clang CXX=clang++ mingw32-make all
       
       - name: Upload executable
       - uses: actions/upload-artifact@v2
         with:
           name: csa-windows
           path: csa.exe
+      
       - name: Upload test executable
       - uses: actions/upload-artifact@v2
         with:
@@ -131,6 +139,7 @@ jobs:
     steps:
       - name: Checkout repo
       - uses: actions/checkout@v2
+      
       - name: Install MSYS2
       - uses: msys2/setup-msys2@v2
         with:
@@ -146,4 +155,4 @@ jobs:
           name: csa-testbench-windows
       
       - name: Run tests
-        run: ./testbench
+      - run: ./testbench

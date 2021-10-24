@@ -58,7 +58,9 @@ jobs:
           name: csa-testbench-linux
       
       - name: Run tests
-        run: ./testbench
+        run: |
+          chmod +x testbench
+          ./testbench
   
   build-macos:
     runs-on: macos-latest
@@ -107,7 +109,9 @@ jobs:
           name: csa-testbench-macos
       
       - name: Run tests
-        run: ./testbench
+        run: |
+          chmod +x testbench
+          ./testbench
   
   build-windows:
     runs-on: windows-latest

@@ -22,9 +22,9 @@ jobs:
       
       - name: Build
         run: make all
-        env: |
-          CC=clang
-          CXX=clang++
+        env:
+          CC: clang
+          CXX: clang++
       
       - name: Upload executable
         uses: actions/upload-artifact@v2
@@ -65,13 +65,14 @@ jobs:
       
       - name: Install dependencies
         run: brew install gtk4 luajit
-        env: HOMEBREW_NO_AUTO_UPDATE=1
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
             
       - name: Build
         run: make all
-        env: |
-          CC=clang
-          CXX=clang++
+        env:
+          CC: clang
+          CXX: clang++
       
       - name: Upload executable
         uses: actions/upload-artifact@v2
@@ -94,7 +95,8 @@ jobs:
       
       - name: Install dependencies
         run: brew install gtk4 luajit
-        env: HOMEBREW_NO_AUTO_UPDATE=1
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
       
       - name: Download test executable
         uses: actions/download-artifact@v2
@@ -125,9 +127,9 @@ jobs:
             
       - name: Build
         run: mingw32-make all
-        env: |
-          CC=clang
-          CXX=clang++
+        env:
+          CC: clang
+          CXX: clang++
       
       - name: Upload executable
         uses: actions/upload-artifact@v2

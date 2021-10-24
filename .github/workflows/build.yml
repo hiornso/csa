@@ -31,6 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: csa-linux
+          path: csa
       
       - name: Upload test executable
         uses: actions/upload-artifact@v2

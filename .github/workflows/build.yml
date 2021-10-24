@@ -17,6 +17,7 @@ jobs:
       
       - name: Install dependencies
         run: |
+          sudo bash -c "echo \"deb http://cz.archive.ubuntu.com/ubuntu impish main\" >> /etc/apt/sources.list"
           sudo apt update
           sudo apt install clang make pkg-config libgtk-4-dev libluajit-5.1-dev
       
@@ -46,6 +47,7 @@ jobs:
       
       - name: Install dependencies
         run: |
+          sudo bash -c "echo \"deb http://cz.archive.ubuntu.com/ubuntu impish main\" >> /etc/apt/sources.list"
           sudo apt update
           sudo apt install libgtk-4-dev libluajit-5.1-dev
       

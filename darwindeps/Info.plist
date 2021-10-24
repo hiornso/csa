@@ -21,6 +21,6 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2021 Oliver Hiorns</string>
 	<key>CFBundleExecutable</key>
-	<string>main</string>
+	<string>csa</string>
 </dict>
 </plist>

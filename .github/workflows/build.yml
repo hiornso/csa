@@ -17,8 +17,8 @@ jobs:
       
       - name: Install dependencies
         run: |
-          apt update
-          apt install clang make pkg-config libgtk-4-dev libluajit-5.1-dev
+          sudo apt update
+          sudo apt install clang make pkg-config libgtk-4-dev libluajit-5.1-dev
       
       - name: Build
         run: make all
@@ -46,8 +46,8 @@ jobs:
       
       - name: Install dependencies
         run: |
-          apt update
-          apt install libgtk-4-dev libluajit-5.1-dev
+          sudo apt update
+          sudo apt install libgtk-4-dev libluajit-5.1-dev
       
       - name: Download test executable
         uses: actions/download-artifact@v2

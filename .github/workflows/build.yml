@@ -29,20 +29,20 @@ jobs:
           
       - name: Archive
         run: |
-          tar -cf csa.tar csa
-          tar -cf testbench.tar testbench
+          tar -cf csa-linux.tar csa
+          tar -cf csa-linux-testbench.tar testbench
       
       - name: Upload executable
         uses: actions/upload-artifact@v2
         with:
-          name: csa-linux
-          path: csa.tar
+          name: csa-linux.tar
+          path: csa-linux.tar
       
       - name: Upload test executable
         uses: actions/upload-artifact@v2
         with:
-          name: csa-testbench-linux
-          path: testbench.tar
+          name: csa-linux-testbench.tar
+          path: csa-linux-testbench.tar
 
   test-linux:
     runs-on: ubuntu-latest
@@ -60,10 +60,10 @@ jobs:
       - name: Download test executable
         uses: actions/download-artifact@v2
         with:
-          name: csa-testbench-linux
+          name: csa-linux-testbench.tar
       
       - name: Extract test executable
-        run: tar -xf testbench.tar
+        run: tar -xf csa-linux-testbench.tar
       
       - name: Run tests
         run: xvfb-run ./testbench
@@ -87,20 +87,20 @@ jobs:
       
       - name: Archive
         run: |
-          tar -cf Captain\ Sonar\ Assist.app.tar Captain\ Sonar\ Assist.app
-          tar -cf testbench.tar testbench
+          tar -cf csa-macos.tar Captain\ Sonar\ Assist.app
+          tar -cf csa-macos-testbench.tar testbench
       
       - name: Upload executable
         uses: actions/upload-artifact@v2
         with:
-          name: csa-macos
-          path: Captain Sonar Assist.app.tar
+          name: csa-macos.tar
+          path: csa-macos.tar
       
       - name: Upload test executable
         uses: actions/upload-artifact@v2
         with:
-          name: csa-testbench-macos
-          path: testbench.tar
+          name: csa-testbench-macos.tar
+          path: csa-linux-testbench.tar
 
   test-macos:
     runs-on: macos-latest
@@ -117,10 +117,10 @@ jobs:
       - name: Download test executable
         uses: actions/download-artifact@v2
         with:
-          name: csa-testbench-macos
+          name: csa-testbench-macos.tar
           
       - name: Extract test executable
-        run: tar -xf testbench.tar
+        run: tar -xf csa-macos-testbench.tar
       
       - name: Run tests
         run: ./testbench
@@ -161,7 +161,7 @@ jobs:
       - name: Upload test executable
         uses: actions/upload-artifact@v2
         with:
-          name: csa-testbench-windows
+          name: csa-windows-testbench
           path: testbench.exe
 
   test-windows:
@@ -186,7 +186,7 @@ jobs:
       - name: Download test executable
         uses: actions/download-artifact@v2
         with:
-          name: csa-testbench-windows
+          name: csa-windows-testbench
       
       - name: Run tests
         run: ./testbench

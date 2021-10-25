@@ -66,9 +66,7 @@ jobs:
         run: tar -xf testbench.tar
       
       - name: Run tests
-        run: |
-          Xvfb :1 -screen 0 1600x1200x24 &
-          DISPLAY=:1 ./testbench
+        run: xvfb-run ./testbench
   
   build-macos:
     runs-on: macos-latest

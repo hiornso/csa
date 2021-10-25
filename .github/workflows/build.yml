@@ -55,7 +55,7 @@ jobs:
         run: |
           sudo bash -c "echo \"deb http://cz.archive.ubuntu.com/ubuntu impish main\" >> /etc/apt/sources.list"
           sudo apt update
-          sudo apt install libgtk-4-dev libluajit-5.1-dev
+          sudo apt install libgtk-4-bin luajit
       
       - name: Download test executable
         uses: actions/download-artifact@v2

@@ -101,37 +101,37 @@ csa: $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/eng
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/main.o: $(OBJDIR) main.c main.h csa_alloc.h engineering.h healthbars.h firstmate.h tracker.h csa_error.h
+$(OBJDIR)/main.o: main.c main.h csa_alloc.h engineering.h healthbars.h firstmate.h tracker.h csa_error.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/main.o main.c
 
-$(OBJDIR)/csa_alloc.o: $(OBJDIR) csa_alloc.c csa_alloc.h
+$(OBJDIR)/csa_alloc.o: csa_alloc.c csa_alloc.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c -o $(OBJDIR)/csa_alloc.o csa_alloc.c
 
-$(OBJDIR)/csa_error.o: $(OBJDIR) csa_error.c csa_error.h
+$(OBJDIR)/csa_error.o: csa_error.c csa_error.h | $(OBJDIR)
 	$(CC) $(CFLAGS) -c -o $(OBJDIR)/csa_error.o csa_error.c
 
-$(OBJDIR)/accelerated.o: $(OBJDIR) accelerated.cpp accelerated.h main.h csa_alloc.h tracker.h
+$(OBJDIR)/accelerated.o: accelerated.cpp accelerated.h main.h csa_alloc.h tracker.h | $(OBJDIR)
 ifeq ($(USE_VCL),1)
 	git submodule update --init
 endif
 	$(CXX) $(CXXFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -DUSE_VECTORS=$(USE_VCL) -c -o $(OBJDIR)/accelerated.o accelerated.cpp
 
-$(OBJDIR)/maprender.o: $(OBJDIR) maprender.c tracker.h main.h csa_alloc.h accelerated.h csa_error.h
+$(OBJDIR)/maprender.o: maprender.c tracker.h main.h csa_alloc.h accelerated.h csa_error.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/maprender.o maprender.c
 
-$(OBJDIR)/tracker.o: $(OBJDIR) tracker.c tracker.h main.h csa_alloc.h csa_error.h
+$(OBJDIR)/tracker.o: tracker.c tracker.h main.h csa_alloc.h csa_error.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/tracker.o tracker.c
 
-$(OBJDIR)/firstmate.o: $(OBJDIR) firstmate.c firstmate.h main.h csa_alloc.h
+$(OBJDIR)/firstmate.o: firstmate.c firstmate.h main.h csa_alloc.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/firstmate.o firstmate.c
 
-$(OBJDIR)/engineering.o: $(OBJDIR) engineering.c engineering.h main.h csa_alloc.h
+$(OBJDIR)/engineering.o: engineering.c engineering.h main.h csa_alloc.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/engineering.o engineering.c
 
-$(OBJDIR)/healthbars.o: $(OBJDIR) healthbars.c healthbars.h main.h csa_alloc.h
+$(OBJDIR)/healthbars.o: healthbars.c healthbars.h main.h csa_alloc.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/healthbars.o healthbars.c
 
-$(OBJDIR)/resources.o: $(OBJDIR) resources.c
+$(OBJDIR)/resources.o: resources.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -Wno-overlength-strings $(GTK_CFLAGS) -c -o $(OBJDIR)/resources.o resources.c
 
 resources.c: csa.gresource.xml resources/builder/menu.ui resources/* resources/*/* resources/*/*/* resources/*/*/*/* maps/*
@@ -143,7 +143,7 @@ resources/builder/menu.ui: $(OSDEPS)/$(MENU)
 testbench: $(OBJDIR)/testbench.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o
 	$(CC) $(LDFLAGS) -o testbench $(OBJDIR)/testbench.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
 
-$(OBJDIR)/testbench.o: $(OBJDIR) testbench.c main.h csa_alloc.h tracker.h accelerated.h csa_error.h
+$(OBJDIR)/testbench.o: testbench.c main.h csa_alloc.h tracker.h accelerated.h csa_error.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/testbench.o testbench.c
 
 .PHONY: clean

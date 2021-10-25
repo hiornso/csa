@@ -55,7 +55,7 @@ jobs:
         run: |
           sudo bash -c "echo \"deb http://cz.archive.ubuntu.com/ubuntu impish main\" >> /etc/apt/sources.list"
           sudo apt update
-          sudo apt install libgtk-4-bin luajit
+          sudo apt install libgtk-4-bin luajit xvfb
       
       - name: Download test executable
         uses: actions/download-artifact@v2
@@ -67,8 +67,8 @@ jobs:
       
       - name: Run tests
         run: |
-          gtk4-broadwayd & # using broadway backend since otherwise GTK is unable to connect to a display
-          GDK_BACKEND=broadway ./testbench
+          Xvfb :1 -screen 0 1600x1200x32 &
+          DISPLAY=:1 ./testbench
   
   build-macos:
     runs-on: macos-latest

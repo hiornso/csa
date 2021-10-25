@@ -99,8 +99,8 @@ jobs:
       - name: Upload test executable
         uses: actions/upload-artifact@v2
         with:
-          name: csa-testbench-macos.tar
-          path: csa-linux-testbench.tar
+          name: csa-macos-testbench.tar
+          path: csa-macos-testbench.tar
 
   test-macos:
     runs-on: macos-latest
@@ -117,7 +117,7 @@ jobs:
       - name: Download test executable
         uses: actions/download-artifact@v2
         with:
-          name: csa-testbench-macos.tar
+          name: csa-macos-testbench.tar
           
       - name: Extract test executable
         run: tar -xf csa-macos-testbench.tar

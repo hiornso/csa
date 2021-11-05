@@ -1347,7 +1347,7 @@ int main(int argc, char *argv[])
 		"https://github.com/hiornso/csa";
 	line_wrap(csa_description);
 	g_application_set_option_context_description(G_APPLICATION(app), csa_description);
-	g_application_set_option_context_parameter_string(G_APPLICATION(app), "[-f FORMAT] [FILES…]");
+	g_application_set_option_context_parameter_string(G_APPLICATION(app), "[FILES…]");
 	
 	g_signal_connect(app, "startup", G_CALLBACK(initialise_application), NULL);
 	g_signal_connect(app, "activate", G_CALLBACK(activate), &cmd_line_options);

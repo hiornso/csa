@@ -1107,7 +1107,7 @@ static void open_map(GApplication *application, GFile **files, int n_files, __at
 
 	char *fmt = options->format;
 	
-	if(strcmp(fmt, "help") == 0){
+	if(fmt != NULL && strcmp(fmt, "help") == 0){
 		char formatters_description[] = 
 			"\033[1mFormat strings\033[0m (for use with -f):\n"
 			"Format strings are parsed on a per-window basis, with windows separated by "

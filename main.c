@@ -1088,11 +1088,50 @@ static void initialise_application(GApplication *app, __attribute__ ((unused)) g
 	g_object_unref(builder);
 }
 
+static void line_wrap(char *str)
+{
+#define LINE_LEN 150
+	for(int i = 0, last = 0; str[i] != '\0'; ++i) {
+		if(i - last > LINE_LEN && str[i] == ' ') {
+			str[i] = '\n';
+			last = i;
+		}else if(str[i] == '\n') {
+			last = i;
+		}
+	}
+}
+
 static void open_map(GApplication *application, GFile **files, int n_files, __attribute__ ((unused)) char *hint, gpointer user_data)
 {
 	CmdLineOptions *options = (CmdLineOptions*)user_data;
 
 	char *fmt = options->format;
+	
+	if(fmt != NULL && strcmp(fmt, "help") == 0){
+		char formatters_description[] = 
+			"\033[1mFormat strings\033[0m (for use with -f):\n"
+			"Format strings are parsed on a per-window basis, with windows separated by "
+			"spaces. Each format unit reads the next file path or map name in from the  "
+			"list of files passed as arguments. Valid format units are:\n"
+			"\033[1;34m\tn\033[0m: \033[1;33mnew window\033[0m\n"
+			"\033[1;34m\ts\033[0m: \033[1;33mload save file\033[0m\n"
+			"\033[1;34m\tc\033[0m: \033[1;33mload file into captain tab\033[0m\n"
+			"\033[1;34m\tr\033[0m: \033[1;33mload file into radio engineer tab\033[0m\n"
+			"\033[1;34m\tb\033[0m: \033[1;33mload file into both captain and radio engineer tabs\033[0m\n"
+			"The `\033[1;34mc\033[0m`, `\033[1;34mr\033[0m` and `\033[1;34mb\033[0m` format units can be "
+			"prefixed with an `\033[1;34ms\033[0m` to load from the maps built into the program rather "
+			"than an external file (this treats the corresponding argument as a map name rather than "
+			"file path).\n"
+			"For example:\n"
+			"\t\033[32mcsa \033[33m-f \033[1m\"n scr b s n\" \033[34mAlpha ~/map.lua ~/map2.lua ~/mysave.csa\033[0m\n"
+			"creates an empty window, a window with the inbuilt \033[34mAlpha\033[0m map loaded into the "
+			"Captain tracker and \033[34m~/map.lua\033[0m loaded into the Radio Engineer tracker, a window "
+			"with \033[34m~/map2.lua\033[0m loaded into both the Captain and Radio Engineer trackers, a window "
+			"into which \033[34m~/mysave.csa\033[0m is loaded and another empty window.\n";
+		line_wrap(formatters_description);
+		printf("%s", formatters_description);
+		return;
+	}
 	
 	int i = 0; // file index in file array
 	int j = 0; // char index in format string
@@ -1215,6 +1254,9 @@ static void open_map(GApplication *application, GFile **files, int n_files, __at
 										is_static = FALSE;
 									}
 								}
+							}else{
+								csa_warning("invalid format specifier unit '%c' is being ignored.\n", fmt[ind]);
+								break;
 							}
 						}
 					}
@@ -1284,12 +1326,28 @@ int main(int argc, char *argv[])
 			G_OPTION_ARG_STRING,
 			&cmd_line_options.format,
 			
-			"Supply a format string to control how the file arguments passed are used to initialise new windows.",
+			"Supply a format string to control how the file arguments passed are used to initialise new windows. Pass \"help\" for a more in-depth explanation.",
 			"FORMAT"
 		},
 		{ NULL, 0, 0, 0, NULL, NULL, NULL }
 	};
 	g_application_add_main_option_entries(G_APPLICATION(app), options);
+	g_application_set_option_context_summary(G_APPLICATION(app), "A program about tracking a submarine.");
+	char csa_description[] =
+		"CSA (Captain Sonar Assist) is a tool to help players win games of Captain Sonar, "
+		"especially by tracking their opponents' positions on maps where this is normally "
+		"infeasible for humans. It also offers ways to keep track of engineering and first "
+		"mate game state for convenience, and generally allows games to be played completely "
+		"within the application, without the need for pen or paper. It aims to be modular, "
+		"stable, accessible and performant. The maps that normally come with Captain Sonar "
+		"are built into the application, but new maps can be easily written with highly "
+		"customisable behaviour using Lua.\n"
+		"\n"
+		"To report any bugs, make a feature request or contribute to the project, see "
+		"https://github.com/hiornso/csa";
+	line_wrap(csa_description);
+	g_application_set_option_context_description(G_APPLICATION(app), csa_description);
+	g_application_set_option_context_parameter_string(G_APPLICATION(app), "[FILES…]");
 	
 	g_signal_connect(app, "startup", G_CALLBACK(initialise_application), NULL);
 	g_signal_connect(app, "activate", G_CALLBACK(activate), &cmd_line_options);

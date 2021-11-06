@@ -15,10 +15,11 @@
 #define WIDTH  1000
 #define HEIGHT 1000
 
-void error_popup(__attribute__ ((unused)) Omni *data, __attribute__ ((unused)) char *fmt, ...){}
-void free_linked_changes(__attribute__ ((unused)) ChangeListNode *cln){}
-void free_linked_states(__attribute__ ((unused)) StateListNode *sln){}
+void error_popup(__attribute__ ((unused)) Omni *data, __attribute__ ((unused)) char *fmt, ...) {}
+void free_linked_changes(__attribute__ ((unused)) ChangeListNode *cln) {}
+void free_linked_states(__attribute__ ((unused)) StateListNode *sln) {}
 const char *crop_to_filename(const char *path) { return path; }
+void update_window_title(__attribute__ ((unused)) Omni *data) {}
 
 int main()
 {

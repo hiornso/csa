@@ -1254,7 +1254,7 @@ static void open_map(GApplication *application, GFile **files, int n_files, __at
 										is_static = FALSE;
 									}
 								}
-							}else{
+							}else if(fmt[ind] != 'r'){ // we won't catch 'r' until the second iteration, it is still valid
 								csa_warning("invalid format specifier unit '%c' is being ignored.\n", fmt[ind]);
 								break;
 							}

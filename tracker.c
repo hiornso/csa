@@ -977,6 +977,8 @@ static void file_select_callback(GtkNativeDialog *native, int response, gpointer
 	
 	GtkWidget *dropdown = is_captain ? data->gui_elems.captain_map_dropdown : data->gui_elems.radio_engineer_map_dropdown;
 	
+	g_signal_handlers_block_by_func(GTK_COMBO_BOX(dropdown), is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
+	
 	if(response == GTK_RESPONSE_ACCEPT){
 		GtkFileChooser *chooser = GTK_FILE_CHOOSER(native);
 		GFile *file = gtk_file_chooser_get_file(chooser);
@@ -987,6 +989,8 @@ static void file_select_callback(GtkNativeDialog *native, int response, gpointer
 		
 		if(!init_tracker(data, filename, FROM_FILE, is_captain)){
 			gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(dropdown), GTK_SENSITIVITY_OFF);
+			gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(filename));
+			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), 0);
 			refresh_drawing_areas(data, is_captain);
 		}else{
 			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), -1);
@@ -997,6 +1001,8 @@ static void file_select_callback(GtkNativeDialog *native, int response, gpointer
 	}else{
 		gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), -1);
 	}
+	
+	g_signal_handlers_unblock_by_func(GTK_COMBO_BOX(dropdown), is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
 
 	g_object_unref(native);
 }
@@ -1044,7 +1050,9 @@ static int dropdown_fix(GtkComboBoxText *box, gpointer user_data, int is_captain
 						gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(box), GTK_SENSITIVITY_OFF);
 						refresh_drawing_areas(data, is_captain);
 					}else{
+						g_signal_handlers_block_by_func(box, is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
 						gtk_combo_box_set_active(GTK_COMBO_BOX(box), -1);
+						g_signal_handlers_unblock_by_func(box, is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
 						error_popup(data, "Failed to load static map.");
 					}
 					g_free(map);

@@ -817,15 +817,15 @@ static void new_window(GApplication *app, FilesToOpen f)
 		if(sorted_names == NULL){
 			csa_warning("failed to allocate memory to sort static map names, so they are being left unsorted.\n");
 			for(int i = 0; names[i] != NULL; ++i){
-				gtk_combo_box_text_prepend_text((GtkComboBoxText*)data->gui_elems.captain_map_dropdown, names[i]);
-				gtk_combo_box_text_prepend_text((GtkComboBoxText*)data->gui_elems.radio_engineer_map_dropdown, names[i]);
+				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.captain_map_dropdown), names[i]);
+				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.radio_engineer_map_dropdown), names[i]);
 			}
 		}else{
 			memcpy(sorted_names, names, sizeof(char*) * len);
 			qsort(sorted_names, len, sizeof(char*), sort_map_names);
 			for(int i = 0; i < len; ++i){
-				gtk_combo_box_text_prepend_text((GtkComboBoxText*)data->gui_elems.captain_map_dropdown, sorted_names[i]);
-				gtk_combo_box_text_prepend_text((GtkComboBoxText*)data->gui_elems.radio_engineer_map_dropdown, sorted_names[i]);
+				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.captain_map_dropdown), sorted_names[i]);
+				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.radio_engineer_map_dropdown), sorted_names[i]);
 			}
 			csa_free(sorted_names);
 		}

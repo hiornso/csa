@@ -573,6 +573,17 @@ static void escape_activate (
 	reset_ui_action(NULL, user_data);
 }
 
+const char* crop_to_filename(const char *path)
+{
+	const char *filename = path;
+	for(int i = 0; path[i] != '\0'; ++i){
+		if(path[i] == '/'){
+			filename = path + i + 1;
+		}
+	}
+	return filename;
+}
+
 static void new_window(GApplication *app, FilesToOpen f)
 {
 	// create program data storage
@@ -918,7 +929,12 @@ static void new_window(GApplication *app, FilesToOpen f)
 		// file past the syntax checker anyway though.
 		if(f.type & LOAD_FIRST){
 			if(!init_tracker(data, f.file1, f.type & STATIC_FIRST ? FROM_STRING : FROM_FILE, TRUE)){
-				gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(data->gui_elems.captain_map_dropdown), GTK_SENSITIVITY_OFF);
+				GtkComboBox *dropdown = GTK_COMBO_BOX(data->gui_elems.captain_map_dropdown);
+				gtk_combo_box_set_button_sensitivity(dropdown, GTK_SENSITIVITY_OFF);
+				g_signal_handlers_block_by_func(dropdown, (void*)captain_dropdown_fix, data);
+				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(f.file1));
+				gtk_combo_box_set_active(dropdown, 0);
+				g_signal_handlers_unblock_by_func(dropdown, (void*)captain_dropdown_fix, data);
 				gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_drawing_area));
 				gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_self_tracking));
 			}else{
@@ -927,7 +943,12 @@ static void new_window(GApplication *app, FilesToOpen f)
 		}
 		if(f.type & LOAD_SECOND){
 			if(!init_tracker(data, f.file2, f.type & STATIC_SECOND ? FROM_STRING : FROM_FILE, FALSE)){
-				gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(data->gui_elems.radio_engineer_map_dropdown), GTK_SENSITIVITY_OFF);
+				GtkComboBox *dropdown = GTK_COMBO_BOX(data->gui_elems.radio_engineer_map_dropdown);
+				gtk_combo_box_set_button_sensitivity(dropdown, GTK_SENSITIVITY_OFF);
+				g_signal_handlers_block_by_func(dropdown, (void*)radio_engineer_dropdown_fix, data);
+				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(f.file2));
+				gtk_combo_box_set_active(dropdown, 0);
+				g_signal_handlers_unblock_by_func(dropdown, (void*)radio_engineer_dropdown_fix, data);
 				gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));
 			}else{
 				error_popup(data, "Failed to load map.");

@@ -302,5 +302,6 @@ void free_linked_changes(ChangeListNode *node);
 void free_linked_states(StateListNode *node);
 int add_state(Omni *data, long long elem);
 const char* crop_to_filename(const char *path);
+void update_window_title(Omni *data);
 
 #endif

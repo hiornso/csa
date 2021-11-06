@@ -991,6 +991,7 @@ static void file_select_callback(GtkNativeDialog *native, int response, gpointer
 			gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(dropdown), GTK_SENSITIVITY_OFF);
 			gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(filename));
 			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), 0);
+			update_window_title(data);
 			refresh_drawing_areas(data, is_captain);
 		}else{
 			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), -1);
@@ -1048,6 +1049,7 @@ static int dropdown_fix(GtkComboBoxText *box, gpointer user_data, int is_captain
 					gpointer map = g_bytes_unref_to_data(map_gbytes, &s);
 					if(!init_tracker(data, (char*)map, FROM_STRING, is_captain)){
 						gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(box), GTK_SENSITIVITY_OFF);
+						update_window_title(data);
 						refresh_drawing_areas(data, is_captain);
 					}else{
 						g_signal_handlers_block_by_func(box, is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);

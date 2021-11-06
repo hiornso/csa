@@ -584,6 +584,56 @@ const char* crop_to_filename(const char *path)
 	return filename;
 }
 
+void update_window_title(Omni *data)
+{
+	GtkWindow *window = GTK_WINDOW(data->gui_elems.window);
+	const char *captain_dropdown_text = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(data->gui_elems.captain_map_dropdown));
+	const char *radio_engineer_dropdown_text = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(data->gui_elems.radio_engineer_map_dropdown));
+	
+	char default_title[] = "Captain Sonar Assist";
+	char *title = NULL;
+	
+	if(captain_dropdown_text == NULL && radio_engineer_dropdown_text == NULL){
+		title = default_title;
+	}else if(captain_dropdown_text == NULL || radio_engineer_dropdown_text == NULL || strcmp(captain_dropdown_text, radio_engineer_dropdown_text) == 0){
+		const char *text = captain_dropdown_text == NULL ? radio_engineer_dropdown_text : captain_dropdown_text;
+		const char prefix[] = "Captain Sonar Assist (";
+		const char end[] = ")";
+		int len = sizeof(prefix) + strlen(text) + sizeof(end) - 1; // -1 because both prefix and end contribute the size of a null char and we only need one
+		title = csa_malloc(len);
+		if(title == NULL){
+			csa_error("failed to allocate memory to construct window title - falling back to default title.\n");
+			title = default_title;
+		}else{
+			memcpy(title, prefix, sizeof(prefix));
+			strcat(title, text);
+			strcat(title, end);
+		}
+	}else{
+		const char prefix[] = "Captain Sonar Assist (";
+		const char sep[] = ", ";
+		const char end[] = ")";
+		int len = sizeof(prefix) + strlen(captain_dropdown_text) + sizeof(sep) + strlen(radio_engineer_dropdown_text) + sizeof(end) - 2; // -2 because all of prefix, sep and end contribute the size of a null char and we only need one
+		title = csa_malloc(len);
+		if(title == NULL){
+			csa_error("failed to allocate memory to construct window title - falling back to default title.\n");
+			title = default_title;
+		}else{
+			memcpy(title, prefix, sizeof(prefix));
+			strcat(title, captain_dropdown_text);
+			strcat(title, sep);
+			strcat(title, radio_engineer_dropdown_text);
+			strcat(title, end);
+		}
+	}
+	
+	gtk_window_set_title(window, title);
+	
+	if(title != default_title){
+		csa_free(title);
+	}
+}
+
 static void new_window(GApplication *app, FilesToOpen f)
 {
 	// create program data storage
@@ -685,7 +735,6 @@ static void new_window(GApplication *app, FilesToOpen f)
 	GtkWidget *window = gtk_application_window_new(GTK_APPLICATION(app));
 	gtk_window_set_child(GTK_WINDOW(window), GTK_WIDGET(gtk_builder_get_object(builder,"rootbox")));
 	
-	gtk_window_set_title(GTK_WINDOW(window),"Captain Sonar Assist");
 	gtk_window_set_icon_name(GTK_WINDOW(window), "captain_sonar_assist");
 	data->gui_elems.window = window;
 
@@ -955,6 +1004,8 @@ static void new_window(GApplication *app, FilesToOpen f)
 			}
 		}
 	}
+	
+	update_window_title(data);
 	
 	gtk_widget_show(window);
 }

@@ -1,48 +1,48 @@
-CC?=cc
-CXX?=c++
+CC  ?= cc
+CXX ?= c++
 
-PKGCONFIG?=pkg-config
+PKGCONFIG ?= pkg-config
 
-USE_VCL?=0
-USE_LTO?=0
-CXXSTD?=c++17
+USE_VCL ?= 0
+USE_LTO ?= 0
 
-OPT_LEVEL?=3
+CXXSTD  ?= c++17
+
+OPT_LEVEL ?= 3
+CFLAGS    += -O$(OPT_LEVEL)
+LDFLAGS   += -O$(OPT_LEVEL)
+
 ifeq ($(USE_LTO),1)
-CFLAGS_OPT?=-O$(OPT_LEVEL) -flto
-LDFLAGS_OPT?=-O$(OPT_LEVEL) -flto
-else
-CFLAGS_OPT?=-O$(OPT_LEVEL)
-LDFLAGS_OPT?=-O$(OPT_LEVEL)
+CFLAGS  += -flto
+LDFLAGS += -flto
 endif
 
-CFLAGS+=$(CFLAGS_OPT) -mavx2 -mfma
-CFLAGS+= -Wall -Wextra -Wpedantic
-CXXFLAGS+=$(CFLAGS) -std=$(CXXSTD)
+CFLAGS   += `$(PKGCONFIG) --cflags gtk4 luajit`
+CFLAGS   += -mavx2 -mfma
+CFLAGS   += -Wall -Wextra -Wpedantic
+CXXFLAGS += $(CFLAGS) -std=$(CXXSTD)
 
-LDFLAGS+=$(LDFLAGS_OPT)
-LDLIBS+=-lpthread -lm
+LDLIBS += `$(PKGCONFIG) --libs gtk4 luajit`
+LDLIBS += -lpthread -lm
 
-GTK_CFLAGS?=`$(PKGCONFIG) --cflags gtk4`
-GTK_LDLIBS?=`$(PKGCONFIG) --libs gtk4`
+OBJDIR ?= obj
 
-LUAJIT_CFLAGS?=`$(PKGCONFIG) --cflags luajit`
-LUAJIT_LDLIBS?=`$(PKGCONFIG) --libs luajit`
+OS ?= $(shell uname)
 
-OS?=$(shell uname)
+OSDEPS ?= osdeps
+DARWINDEPS ?= darwindeps
+LINUXDEPS  ?= linuxdeps
+MACOS_APP_NAME ?= Captain\ Sonar\ Assist.app
 
-OBJDIR?=obj
-OSDEPS?=osdeps
-DARWINDEPS?=darwindeps
-LINUXDEPS?=linuxdeps
-MACOS_APP_NAME?=Captain\ Sonar\ Assist.app
+CSA = csa
+TESTBENCH = testbench
 
 ifeq ($(OS),Darwin)
-MENU=menu_darwin.ui
-TARGET=$(MACOS_APP_NAME)
+MENU = menu_darwin.ui
+TARGET = $(MACOS_APP_NAME)
 else
-MENU=menu.ui
-TARGET=csa
+MENU = menu.ui
+TARGET = csa
 endif
 
 .PHONY: default
@@ -76,7 +76,7 @@ else ifeq ($(OS),Linux)
 else
 	@echo "This Makefile does not support installation on your OS, so there is nothing to uninstall."
 endif
-	
+
 $(MACOS_APP_NAME): csa $(DARWINDEPS)/Info.plist $(DARWINDEPS)/AppIcon.icns
 	mkdir -p $(MACOS_APP_NAME)/Contents/MacOS/
 	mkdir -p $(MACOS_APP_NAME)/Contents/Resources/
@@ -84,7 +84,8 @@ $(MACOS_APP_NAME): csa $(DARWINDEPS)/Info.plist $(DARWINDEPS)/AppIcon.icns
 	cp $(DARWINDEPS)/AppIcon.icns $(MACOS_APP_NAME)/Contents/Resources/
 	cp csa $(MACOS_APP_NAME)/Contents/MacOS/
 
-csa: $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/engineering.o $(OBJDIR)/firstmate.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o
+
+$(CSA): $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/engineering.o $(OBJDIR)/firstmate.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o
 	$(CC) $(LDFLAGS) -o csa $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/engineering.o $(OBJDIR)/firstmate.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
 
 $(OBJDIR):
@@ -137,7 +138,7 @@ $(OBJDIR)/testbench.o: testbench.c main.h csa_alloc.h tracker.h accelerated.h cs
 
 .PHONY: clean
 clean:
-	rm -f csa testbench testbench.png resources.c resources/builder/menu.ui $(OBJDIR)/*
+	rm -f $(CSA) $(TESTBENCH) testbench.png resources.c resources/builder/menu.ui $(OBJDIR)/*
 ifeq ($(OS),Darwin)
 	rm -rf $(MACOS_APP_NAME)
 endif

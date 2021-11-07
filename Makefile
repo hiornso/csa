@@ -37,17 +37,6 @@ DARWINDEPS?=darwindeps
 LINUXDEPS?=linuxdeps
 MACOS_APP_NAME?=Captain\ Sonar\ Assist.app
 
-DISTRIB_FILENAME:=$(shell date +"csa_%F_%H-%M-%S")
-DISTRIB_DIR?=distrib
-DO_GZIP_DISTRIB?=1
-DO_LRZIP_DISTRIB?=1
-ifeq ($(OS),Darwin)
-TAR?=gtar
-else
-TAR?=tar
-endif
-LRZIP?=lrzip
-
 ifeq ($(OS),Darwin)
 MENU=menu_darwin.ui
 TARGET=$(MACOS_APP_NAME)
@@ -152,17 +141,3 @@ clean:
 ifeq ($(OS),Darwin)
 	rm -rf $(MACOS_APP_NAME)
 endif
-
-.PHONY: distrib
-distrib: clean
-	mkdir -p $(DISTRIB_DIR)
-ifeq ($(DO_GZIP_DISTRIB),1)
-	$(TAR) --transform "s+^.+$(DISTRIB_FILENAME)+" -czf $(DISTRIB_DIR)/$(DISTRIB_FILENAME).tar.gz --exclude=distrib --exclude=resources/images/engineering/svgs --exclude=resources/images/first-mate/svgs .
-endif
-ifeq ($(DO_LRZIP_DISTRIB),1)
-	$(TAR) --transform "s+^.+$(DISTRIB_FILENAME)+" -cf - --exclude=distrib --exclude=resources/images/engineering/svgs --exclude=resources/images/first-mate/svgs . | $(LRZIP) -q -o $(DISTRIB_DIR)/$(DISTRIB_FILENAME).tar.lrz
-endif
-
-.PHONY: clean_distrib
-clean_distrib:
-	rm -rf $(DISTRIB_DIR)

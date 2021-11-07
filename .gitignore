@@ -1,5 +1,4 @@
 .vscode
-distrib/**
 csa
 testbench
 testbench.png

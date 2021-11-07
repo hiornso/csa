@@ -25,7 +25,7 @@ CXXFLAGS += $(CFLAGS) -std=$(CXXSTD)
 LDLIBS += `$(PKGCONFIG) --libs gtk4 luajit`
 LDLIBS += -lpthread -lm
 
-OBJDIR ?= obj
+BUILD_DIR ?= build
 
 OS ?= $(shell uname)
 
@@ -49,7 +49,7 @@ endif
 default: $(TARGET)
 
 .PHONY: all
-all: $(TARGET) testbench
+all: $(TARGET) $(TESTBENCH)
 
 .PHONY: install
 install: $(TARGET)
@@ -85,44 +85,44 @@ $(MACOS_APP_NAME): csa $(DARWINDEPS)/Info.plist $(DARWINDEPS)/AppIcon.icns
 	cp csa $(MACOS_APP_NAME)/Contents/MacOS/
 
 
-$(CSA): $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/engineering.o $(OBJDIR)/firstmate.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o
-	$(CC) $(LDFLAGS) -o csa $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/engineering.o $(OBJDIR)/firstmate.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
+$(CSA): $(BUILD_DIR)/main.o $(BUILD_DIR)/csa_alloc.o $(BUILD_DIR)/healthbars.o $(BUILD_DIR)/engineering.o $(BUILD_DIR)/firstmate.o $(BUILD_DIR)/tracker.o $(BUILD_DIR)/maprender.o $(BUILD_DIR)/accelerated.o $(BUILD_DIR)/resources.o $(BUILD_DIR)/csa_error.o
+	$(CC) $(LDFLAGS) -o $(CSA) $(BUILD_DIR)/main.o $(BUILD_DIR)/csa_alloc.o $(BUILD_DIR)/healthbars.o $(BUILD_DIR)/engineering.o $(BUILD_DIR)/firstmate.o $(BUILD_DIR)/tracker.o $(BUILD_DIR)/maprender.o $(BUILD_DIR)/accelerated.o $(BUILD_DIR)/resources.o $(BUILD_DIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
 
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-$(OBJDIR)/main.o: main.c main.h csa_alloc.h engineering.h healthbars.h firstmate.h tracker.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/main.o main.c
+$(BUILD_DIR)/main.o: main.c main.h csa_alloc.h engineering.h healthbars.h firstmate.h tracker.h csa_error.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(BUILD_DIR)/main.o main.c
 
-$(OBJDIR)/csa_alloc.o: csa_alloc.c csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c -o $(OBJDIR)/csa_alloc.o csa_alloc.c
+$(BUILD_DIR)/csa_alloc.o: csa_alloc.c csa_alloc.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c -o $(BUILD_DIR)/csa_alloc.o csa_alloc.c
 
-$(OBJDIR)/csa_error.o: csa_error.c csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c -o $(OBJDIR)/csa_error.o csa_error.c
+$(BUILD_DIR)/csa_error.o: csa_error.c csa_error.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c -o $(BUILD_DIR)/csa_error.o csa_error.c
 
-$(OBJDIR)/accelerated.o: accelerated.cpp accelerated.h main.h csa_alloc.h tracker.h | $(OBJDIR)
+$(BUILD_DIR)/accelerated.o: accelerated.cpp accelerated.h main.h csa_alloc.h tracker.h | $(BUILD_DIR)
 ifeq ($(USE_VCL),1)
 	git submodule update --init
 endif
-	$(CXX) $(CXXFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -DUSE_VECTORS=$(USE_VCL) -c -o $(OBJDIR)/accelerated.o accelerated.cpp
+	$(CXX) $(CXXFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -DUSE_VECTORS=$(USE_VCL) -c -o $(BUILD_DIR)/accelerated.o accelerated.cpp
 
-$(OBJDIR)/maprender.o: maprender.c tracker.h main.h csa_alloc.h accelerated.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/maprender.o maprender.c
+$(BUILD_DIR)/maprender.o: maprender.c tracker.h main.h csa_alloc.h accelerated.h csa_error.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(BUILD_DIR)/maprender.o maprender.c
 
-$(OBJDIR)/tracker.o: tracker.c tracker.h main.h csa_alloc.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/tracker.o tracker.c
+$(BUILD_DIR)/tracker.o: tracker.c tracker.h main.h csa_alloc.h csa_error.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(BUILD_DIR)/tracker.o tracker.c
 
-$(OBJDIR)/firstmate.o: firstmate.c firstmate.h main.h csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/firstmate.o firstmate.c
+$(BUILD_DIR)/firstmate.o: firstmate.c firstmate.h main.h csa_alloc.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(BUILD_DIR)/firstmate.o firstmate.c
 
-$(OBJDIR)/engineering.o: engineering.c engineering.h main.h csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/engineering.o engineering.c
+$(BUILD_DIR)/engineering.o: engineering.c engineering.h main.h csa_alloc.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(BUILD_DIR)/engineering.o engineering.c
 
-$(OBJDIR)/healthbars.o: healthbars.c healthbars.h main.h csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/healthbars.o healthbars.c
+$(BUILD_DIR)/healthbars.o: healthbars.c healthbars.h main.h csa_alloc.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(BUILD_DIR)/healthbars.o healthbars.c
 
-$(OBJDIR)/resources.o: resources.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -Wno-overlength-strings $(GTK_CFLAGS) -c -o $(OBJDIR)/resources.o resources.c
+$(BUILD_DIR)/resources.o: resources.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -Wno-overlength-strings $(GTK_CFLAGS) -c -o $(BUILD_DIR)/resources.o resources.c
 
 resources.c: csa.gresource.xml resources/builder/menu.ui resources/* resources/*/* resources/*/*/* resources/*/*/*/* maps/*
 	glib-compile-resources --generate-source --target=resources.c csa.gresource.xml
@@ -130,15 +130,15 @@ resources.c: csa.gresource.xml resources/builder/menu.ui resources/* resources/*
 resources/builder/menu.ui: $(OSDEPS)/$(MENU)
 	cp $(OSDEPS)/$(MENU) resources/builder/menu.ui
 
-testbench: $(OBJDIR)/testbench.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o
-	$(CC) $(LDFLAGS) -o testbench $(OBJDIR)/testbench.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
+$(TESTBENCH): $(BUILD_DIR)/testbench.o $(BUILD_DIR)/csa_alloc.o $(BUILD_DIR)/tracker.o $(BUILD_DIR)/maprender.o $(BUILD_DIR)/accelerated.o $(BUILD_DIR)/resources.o $(BUILD_DIR)/csa_error.o
+	$(CC) $(LDFLAGS) -o $(TESTBENCH) $(BUILD_DIR)/testbench.o $(BUILD_DIR)/csa_alloc.o $(BUILD_DIR)/tracker.o $(BUILD_DIR)/maprender.o $(BUILD_DIR)/accelerated.o $(BUILD_DIR)/resources.o $(BUILD_DIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
 
-$(OBJDIR)/testbench.o: testbench.c main.h csa_alloc.h tracker.h accelerated.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/testbench.o testbench.c
+$(BUILD_DIR)/testbench.o: testbench.c main.h csa_alloc.h tracker.h accelerated.h csa_error.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(BUILD_DIR)/testbench.o testbench.c
 
 .PHONY: clean
 clean:
-	rm -f $(CSA) $(TESTBENCH) testbench.png resources.c resources/builder/menu.ui $(OBJDIR)/*
+	rm -f $(CSA) $(TESTBENCH) testbench.png resources.c resources/builder/menu.ui $(BUILD_DIR)/*
 ifeq ($(OS),Darwin)
 	rm -rf $(MACOS_APP_NAME)
 endif

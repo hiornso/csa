@@ -42,7 +42,7 @@ MENU = menu_darwin.ui
 TARGET = $(MACOS_APP_NAME)
 else
 MENU = menu.ui
-TARGET = csa
+TARGET = $(CSA)
 endif
 
 .PHONY: default

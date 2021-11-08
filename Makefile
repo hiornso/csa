@@ -1,73 +1,70 @@
-CC?=cc
-CXX?=c++
+CC  ?= cc
+CXX ?= c++
 
-PKGCONFIG?=pkg-config
+PKGCONFIG ?= pkg-config
 
-USE_VCL?=0
-USE_LTO?=0
-CXXSTD?=c++17
+USE_VCL ?= 0
+USE_LTO ?= 0
 
-OPT_LEVEL?=3
+CFLAGS += -MMD -MP
+
+CXXSTD ?= c++17
+
+OPT_LEVEL ?= 3
+CFLAGS    += -O$(OPT_LEVEL)
+LDFLAGS   += -O$(OPT_LEVEL)
+
 ifeq ($(USE_LTO),1)
-CFLAGS_OPT?=-O$(OPT_LEVEL) -flto
-LDFLAGS_OPT?=-O$(OPT_LEVEL) -flto
-else
-CFLAGS_OPT?=-O$(OPT_LEVEL)
-LDFLAGS_OPT?=-O$(OPT_LEVEL)
+CFLAGS  += -flto
+LDFLAGS += -flto
 endif
 
-CFLAGS+=$(CFLAGS_OPT) -mavx2 -mfma
-CFLAGS+= -Wall -Wextra -Wpedantic
-CXXFLAGS+=$(CFLAGS) -std=$(CXXSTD)
+CFLAGS   += `$(PKGCONFIG) --cflags gtk4 luajit`
+CFLAGS   += -mavx2 -mfma
+CFLAGS   += -Wall -Wextra -Wpedantic -Wno-overlength-strings
+CXXFLAGS += $(CFLAGS) -std=$(CXXSTD)
 
-LDFLAGS+=$(LDFLAGS_OPT)
-LDLIBS+=-lpthread -lm
+LDLIBS += `$(PKGCONFIG) --libs gtk4 luajit`
+LDLIBS += -lpthread -lm
 
-GTK_CFLAGS?=`$(PKGCONFIG) --cflags gtk4`
-GTK_LDLIBS?=`$(PKGCONFIG) --libs gtk4`
+BUILD_DIR ?= build
 
-LUAJIT_CFLAGS?=`$(PKGCONFIG) --cflags luajit`
-LUAJIT_LDLIBS?=`$(PKGCONFIG) --libs luajit`
+OS ?= $(shell uname)
 
-OS?=$(shell uname)
+OSDEPS ?= osdeps
+DARWINDEPS ?= darwindeps
+LINUXDEPS  ?= linuxdeps
+MACOS_APP_NAME ?= Captain\ Sonar\ Assist.app
 
-OBJDIR?=obj
-OSDEPS?=osdeps
-DARWINDEPS?=darwindeps
-LINUXDEPS?=linuxdeps
-MACOS_APP_NAME?=Captain\ Sonar\ Assist.app
+CSA = csa
+TESTBENCH = testbench
 
-DISTRIB_FILENAME:=$(shell date +"csa_%F_%H-%M-%S")
-DISTRIB_DIR?=distrib
-DO_GZIP_DISTRIB?=1
-DO_LRZIP_DISTRIB?=1
-ifeq ($(OS),Darwin)
-TAR?=gtar
-else
-TAR?=tar
-endif
-LRZIP?=lrzip
+OBJECTS = $(BUILD_DIR)/main.o $(BUILD_DIR)/testbench.o $(BUILD_DIR)/csa_alloc.o $(BUILD_DIR)/healthbars.o $(BUILD_DIR)/engineering.o $(BUILD_DIR)/firstmate.o $(BUILD_DIR)/tracker.o $(BUILD_DIR)/maprender.o $(BUILD_DIR)/accelerated.o $(BUILD_DIR)/resources.o $(BUILD_DIR)/csa_error.o
+CSA_OBJECTS = $(filter-out $(BUILD_DIR)/testbench.o, $(OBJECTS))
+TESTBENCH_OBJECTS = $(filter-out $(BUILD_DIR)/main.o $(BUILD_DIR)/healthbars.o $(BUILD_DIR)/engineering.o $(BUILD_DIR)/firstmate.o, $(OBJECTS))
+
+DEPENDS = $(patsubst %.o, %.d, $(OBJECTS))
 
 ifeq ($(OS),Darwin)
-MENU=menu_darwin.ui
-TARGET=$(MACOS_APP_NAME)
+MENU = $(OSDEPS)/menu_darwin.ui
+TARGET = $(MACOS_APP_NAME)
 else
-MENU=menu.ui
-TARGET=csa
+MENU = $(OSDEPS)/menu.ui
+TARGET = $(CSA)
 endif
 
 .PHONY: default
 default: $(TARGET)
 
 .PHONY: all
-all: $(TARGET) testbench
+all: $(TARGET) $(TESTBENCH)
 
 .PHONY: install
 install: $(TARGET)
 ifeq ($(OS),Darwin)
 	cp -r $(MACOS_APP_NAME) /Applications/
 else ifeq ($(OS),Linux)
-	cp csa /usr/local/bin/captain-sonar-assist
+	cp $(CSA) /usr/local/bin/captain-sonar-assist
 	cp $(LINUXDEPS)/captain_sonar_assist.desktop /usr/share/applications/
 	cp $(LINUXDEPS)/captain_sonar_assist.svg /usr/share/icons/hicolor/scalable/apps/captain_sonar_assist.svg
 	gtk4-update-icon-cache -f /usr/share/icons/hicolor
@@ -87,82 +84,45 @@ else ifeq ($(OS),Linux)
 else
 	@echo "This Makefile does not support installation on your OS, so there is nothing to uninstall."
 endif
-	
-$(MACOS_APP_NAME): csa $(DARWINDEPS)/Info.plist $(DARWINDEPS)/AppIcon.icns
+
+$(MACOS_APP_NAME): $(CSA) $(DARWINDEPS)/Info.plist $(DARWINDEPS)/AppIcon.icns
 	mkdir -p $(MACOS_APP_NAME)/Contents/MacOS/
 	mkdir -p $(MACOS_APP_NAME)/Contents/Resources/
 	cp $(DARWINDEPS)/Info.plist $(MACOS_APP_NAME)/Contents/
 	cp $(DARWINDEPS)/AppIcon.icns $(MACOS_APP_NAME)/Contents/Resources/
-	cp csa $(MACOS_APP_NAME)/Contents/MacOS/
+	cp $(CSA) $(MACOS_APP_NAME)/Contents/MacOS/
 
-csa: $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/engineering.o $(OBJDIR)/firstmate.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o
-	$(CC) $(LDFLAGS) -o csa $(OBJDIR)/main.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/healthbars.o $(OBJDIR)/engineering.o $(OBJDIR)/firstmate.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
 
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
+-include $(DEPENDS)
 
-$(OBJDIR)/main.o: main.c main.h csa_alloc.h engineering.h healthbars.h firstmate.h tracker.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/main.o main.c
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
-$(OBJDIR)/csa_alloc.o: csa_alloc.c csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c -o $(OBJDIR)/csa_alloc.o csa_alloc.c
+$(CSA): $(CSA_OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-$(OBJDIR)/csa_error.o: csa_error.c csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) -c -o $(OBJDIR)/csa_error.o csa_error.c
+$(TESTBENCH): $(TESTBENCH_OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-$(OBJDIR)/accelerated.o: accelerated.cpp accelerated.h main.h csa_alloc.h tracker.h | $(OBJDIR)
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BUILD_DIR)/accelerated.o: accelerated.cpp | $(BUILD_DIR)
 ifeq ($(USE_VCL),1)
 	git submodule update --init
 endif
-	$(CXX) $(CXXFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -DUSE_VECTORS=$(USE_VCL) -c -o $(OBJDIR)/accelerated.o accelerated.cpp
-
-$(OBJDIR)/maprender.o: maprender.c tracker.h main.h csa_alloc.h accelerated.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/maprender.o maprender.c
-
-$(OBJDIR)/tracker.o: tracker.c tracker.h main.h csa_alloc.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/tracker.o tracker.c
-
-$(OBJDIR)/firstmate.o: firstmate.c firstmate.h main.h csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/firstmate.o firstmate.c
-
-$(OBJDIR)/engineering.o: engineering.c engineering.h main.h csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/engineering.o engineering.c
-
-$(OBJDIR)/healthbars.o: healthbars.c healthbars.h main.h csa_alloc.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) -c -o $(OBJDIR)/healthbars.o healthbars.c
-
-$(OBJDIR)/resources.o: resources.c | $(OBJDIR)
-	$(CC) $(CFLAGS) -Wno-overlength-strings $(GTK_CFLAGS) -c -o $(OBJDIR)/resources.o resources.c
+	$(CXX) $(CXXFLAGS) -DUSE_VECTORS=$(USE_VCL) -c -o $@ $<
 
 resources.c: csa.gresource.xml resources/builder/menu.ui resources/* resources/*/* resources/*/*/* resources/*/*/*/* maps/*
 	glib-compile-resources --generate-source --target=resources.c csa.gresource.xml
 
-resources/builder/menu.ui: $(OSDEPS)/$(MENU)
-	cp $(OSDEPS)/$(MENU) resources/builder/menu.ui
-
-testbench: $(OBJDIR)/testbench.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o
-	$(CC) $(LDFLAGS) -o testbench $(OBJDIR)/testbench.o $(OBJDIR)/csa_alloc.o $(OBJDIR)/tracker.o $(OBJDIR)/maprender.o $(OBJDIR)/accelerated.o $(OBJDIR)/resources.o $(OBJDIR)/csa_error.o $(GTK_LDLIBS) $(LUAJIT_LDLIBS) $(LDLIBS)
-
-$(OBJDIR)/testbench.o: testbench.c main.h csa_alloc.h tracker.h accelerated.h csa_error.h | $(OBJDIR)
-	$(CC) $(CFLAGS) $(GTK_CFLAGS) $(LUAJIT_CFLAGS) -c -o $(OBJDIR)/testbench.o testbench.c
+resources/builder/menu.ui: $(MENU)
+	cp $(MENU) resources/builder/menu.ui
 
 .PHONY: clean
 clean:
-	rm -f csa testbench testbench.png resources.c resources/builder/menu.ui $(OBJDIR)/*
+	rm -f $(CSA) $(TESTBENCH) testbench.png resources.c resources/builder/menu.ui
+	rm -rf $(BUILD_DIR) 
 ifeq ($(OS),Darwin)
 	rm -rf $(MACOS_APP_NAME)
 endif
-
-.PHONY: distrib
-distrib: clean
-	mkdir -p $(DISTRIB_DIR)
-ifeq ($(DO_GZIP_DISTRIB),1)
-	$(TAR) --transform "s+^.+$(DISTRIB_FILENAME)+" -czf $(DISTRIB_DIR)/$(DISTRIB_FILENAME).tar.gz --exclude=distrib --exclude=resources/images/engineering/svgs --exclude=resources/images/first-mate/svgs .
-endif
-ifeq ($(DO_LRZIP_DISTRIB),1)
-	$(TAR) --transform "s+^.+$(DISTRIB_FILENAME)+" -cf - --exclude=distrib --exclude=resources/images/engineering/svgs --exclude=resources/images/first-mate/svgs . | $(LRZIP) -q -o $(DISTRIB_DIR)/$(DISTRIB_FILENAME).tar.lrz
-endif
-
-.PHONY: clean_distrib
-clean_distrib:
-	rm -rf $(DISTRIB_DIR)

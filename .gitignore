@@ -1,10 +1,9 @@
 .vscode
-distrib/**
 csa
 testbench
 testbench.png
 resources.c
 osheader.h
 resources/builder/menu.ui
-obj/**
+build/**
 Captain Sonar Assist.app

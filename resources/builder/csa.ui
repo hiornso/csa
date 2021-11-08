@@ -254,25 +254,21 @@
                 </child>
                 <child>
                   <object class="GtkGrid">
-                    <property name="vexpand">1</property>
                     <property name="can-focus">0</property>
                     <property name="margin-top">10</property>
                     <property name="margin-bottom">10</property>
                     <property name="row-homogeneous">1</property>
                     <property name="column-homogeneous">1</property>
-                    <property name="row-spacing">5</property>
+                    <property name="row-spacing">10</property>
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/torpedo128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/pngs/torpedo128.png</property>
                           </object>
                         </child>
                         <child>
@@ -305,15 +301,12 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/mine128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/pngs/mine128.png</property>
                           </object>
                         </child>
                         <child>
@@ -346,15 +339,12 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/recon128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/pngs/recon128.png</property>
                           </object>
                         </child>
                         <child>
@@ -387,15 +377,12 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/sonar128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/pngs/sonar128.png</property>
                           </object>
                         </child>
                         <child>
@@ -428,15 +415,12 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/silence128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/pngs/silence128.png</property>
                           </object>
                         </child>
                         <child>
@@ -469,15 +453,12 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/special128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/pngs/special128.png</property>
                           </object>
                         </child>
                         <child>

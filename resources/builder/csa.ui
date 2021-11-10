@@ -272,6 +272,12 @@
                           </object>
                         </child>
                         <child>
+                          <object class="GtkLabel">
+                            <property name="label">Torpedo</property>
+                            <property name="margin-bottom">10</property>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkLevelBar" id="first_mate_torpedo_levelbar">
                             <property name="height-request">30</property>
                             <property name="can-focus">0</property>
@@ -307,6 +313,12 @@
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
                             <property name="file">resource://images/first-mate/svgs/mine.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Mine</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -348,6 +360,12 @@
                           </object>
                         </child>
                         <child>
+                          <object class="GtkLabel">
+                            <property name="label">Drone</property>
+                            <property name="margin-bottom">10</property>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkLevelBar" id="first_mate_drone_levelbar">
                             <property name="height-request">30</property>
                             <property name="can-focus">0</property>
@@ -383,6 +401,12 @@
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
                             <property name="file">resource://images/first-mate/svgs/sonar.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Sonar</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -424,6 +448,12 @@
                           </object>
                         </child>
                         <child>
+                          <object class="GtkLabel">
+                            <property name="label">Silence</property>
+                            <property name="margin-bottom">10</property>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkLevelBar" id="first_mate_silence_levelbar">
                             <property name="height-request">30</property>
                             <property name="can-focus">0</property>
@@ -459,6 +489,12 @@
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
                             <property name="file">resource://images/first-mate/svgs/special.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Special Weapon</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>

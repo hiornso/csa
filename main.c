@@ -21,6 +21,8 @@
 #define CSA_APPLICATION_ID "com.csa"
 #define ABOUT_WINDOW_SHOW_SYSTEM_INFORMATION TRUE
 #define FORCE_APPLICATION_DESTROY_WINDOWS_ON_QUIT TRUE
+#define CSA_DEFAULT_WIDTH 1000
+#define CSA_DEFAULT_HEIGHT 750
 
 // build info
 #if defined(__clang__)
@@ -733,6 +735,7 @@ static void new_window(GApplication *app, FilesToOpen f)
 	
 	// pull out toplevel window and set up bindings
 	GtkWidget *window = gtk_application_window_new(GTK_APPLICATION(app));
+	gtk_window_set_default_size(GTK_WINDOW(window), CSA_DEFAULT_WIDTH, CSA_DEFAULT_HEIGHT);
 	gtk_window_set_child(GTK_WINDOW(window), GTK_WIDGET(gtk_builder_get_object(builder,"rootbox")));
 	
 	gtk_window_set_icon_name(GTK_WINDOW(window), "captain_sonar_assist");

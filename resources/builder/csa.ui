@@ -268,7 +268,7 @@
                           <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="file">resource://images/first-mate/pngs/torpedo128.png</property>
+                            <property name="file">resource://images/first-mate/svgs/torpedo.svg</property>
                           </object>
                         </child>
                         <child>
@@ -306,7 +306,7 @@
                           <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="file">resource://images/first-mate/pngs/mine128.png</property>
+                            <property name="file">resource://images/first-mate/svgs/mine.svg</property>
                           </object>
                         </child>
                         <child>
@@ -344,7 +344,7 @@
                           <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="file">resource://images/first-mate/pngs/recon128.png</property>
+                            <property name="file">resource://images/first-mate/svgs/recon.svg</property>
                           </object>
                         </child>
                         <child>
@@ -382,7 +382,7 @@
                           <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="file">resource://images/first-mate/pngs/sonar128.png</property>
+                            <property name="file">resource://images/first-mate/svgs/sonar.svg</property>
                           </object>
                         </child>
                         <child>
@@ -420,7 +420,7 @@
                           <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="file">resource://images/first-mate/pngs/silence128.png</property>
+                            <property name="file">resource://images/first-mate/svgs/silence.svg</property>
                           </object>
                         </child>
                         <child>
@@ -458,7 +458,7 @@
                           <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="file">resource://images/first-mate/pngs/special128.png</property>
+                            <property name="file">resource://images/first-mate/svgs/special.svg</property>
                           </object>
                         </child>
                         <child>

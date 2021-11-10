@@ -10,13 +10,13 @@
     <file compressed="true" alias="weapons25.png">resources/images/engineering/pngs/weapons25.png</file>
     <file compressed="true" alias="silence25.png">resources/images/engineering/pngs/silence25.png</file>
   </gresource>
-  <gresource prefix="/images/first-mate/pngs">
-    <file compressed="true" alias="torpedo128.png">resources/images/first-mate/pngs/torpedo128.png</file>
-    <file compressed="true" alias="mine128.png">resources/images/first-mate/pngs/torpedo128.png</file>
-    <file compressed="true" alias="recon128.png">resources/images/first-mate/pngs/recon128.png</file>
-    <file compressed="true" alias="sonar128.png">resources/images/first-mate/pngs/sonar128.png</file>
-    <file compressed="true" alias="silence128.png">resources/images/first-mate/pngs/silence128.png</file>
-    <file compressed="true" alias="special128.png">resources/images/first-mate/pngs/silence128.png</file>
+  <gresource prefix="/images/first-mate/svgs">
+    <file compressed="true" alias="torpedo.svg">resources/images/first-mate/svgs/torpedo.svg</file>
+    <file compressed="true" alias="mine.svg">resources/images/first-mate/svgs/torpedo.svg</file>
+    <file compressed="true" alias="recon.svg">resources/images/first-mate/svgs/recon.svg</file>
+    <file compressed="true" alias="sonar.svg">resources/images/first-mate/svgs/sonar.svg</file>
+    <file compressed="true" alias="silence.svg">resources/images/first-mate/svgs/silence.svg</file>
+    <file compressed="true" alias="special.svg">resources/images/first-mate/svgs/silence.svg</file>
   </gresource>
   <gresource prefix="/images/logo">
     <file compressed="true" alias="logo.png">resources/images/logo/logo.png</file>

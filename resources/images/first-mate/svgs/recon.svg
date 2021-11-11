@@ -1,1 +1,261 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024"><defs><style>.\31 4973f87-b5d9-4fd3-ab5e-085de99cdc5a,.\32 bdd2c48-ffae-498f-ad39-d60073c06183,.\36 8b5564a-1d92-4916-8a35-b0180ac4e006{fill:none;}.e8f9d350-41f8-4b26-ba24-a6cc12555806{clip-path:url(#88744060-c499-46f8-b6d1-db9fe2c2b928);}.e96aa558-f163-412f-bcd4-3fa337824267{fill:#ffe60f;}.f3128be2-ce90-43a3-916d-0e39f634bacf{clip-path:url(#11acdf55-284e-4c7e-ab99-be3443d63127);}.\37 8d4e234-6b10-42a4-87e6-1b9698340498{fill:#16549f;}.\32 bdd2c48-ffae-498f-ad39-d60073c06183{stroke:#139ad2;stroke-width:5px;}.\31 4973f87-b5d9-4fd3-ab5e-085de99cdc5a,.\32 bdd2c48-ffae-498f-ad39-d60073c06183{stroke-miterlimit:10;}.\31 4973f87-b5d9-4fd3-ab5e-085de99cdc5a{stroke:#ee2d24;stroke-width:15px;}.e50da5d5-4710-4afe-b349-586036b81e97{fill:#ee2d24;}</style><clipPath id="88744060-c499-46f8-b6d1-db9fe2c2b928"><circle id="11735fd1-34fb-48f5-8633-fdbb6061ec4d" data-name="mask" class="68b5564a-1d92-4916-8a35-b0180ac4e006" cx="-532" cy="512" r="512"/></clipPath><clipPath id="11acdf55-284e-4c7e-ab99-be3443d63127"><circle id="6cd5c944-70fa-477f-b3f0-323beae87cca" data-name="mask" class="68b5564a-1d92-4916-8a35-b0180ac4e006" cx="512.63" cy="512" r="512"/></clipPath></defs><title>recon</title><g id="23df7e62-e470-451a-86bc-4a95b82db392" data-name="nuclear"><g class="e8f9d350-41f8-4b26-ba24-a6cc12555806"><g id="5428dae1-8906-4abc-9b1c-b3252aeaf6af" data-name="Layer 3"><g id="2ba8e194-dd33-47f9-84a4-7f51f9cddd62" data-name="construction"><polyline class="e96aa558-f163-412f-bcd4-3fa337824267" points="-532.63 512 -152.91 1054.3 126.88 569.7 -532.63 512"/></g></g></g></g><g id="91d3ff60-31ab-4d73-bb91-1f8632bb4f8c" data-name="recon"><g class="f3128be2-ce90-43a3-916d-0e39f634bacf"><g id="e7144b63-2bdd-45c0-a5f8-a70519b44eee" data-name="Layer 3 copy"><rect id="97e11ddf-2ea8-4f27-907b-9288ddc7e88a" data-name="background" class="78d4e234-6b10-42a4-87e6-1b9698340498" x="0.63" width="1024" height="1024"/><g id="49c1d5d8-d6af-4e6e-8ac8-e6d78413d5fd" data-name="Layer 6"><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="1013" x2="1013" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="913" x2="913" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="813" x2="813" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="613" x2="613" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="412" x2="412" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="312" x2="312" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="212" x2="212" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="112" x2="112" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="12" x2="12" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" x1="513" x2="513" y2="1024"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="11.5" x2="1024" y2="11.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="111.5" x2="1024" y2="111.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="211.5" x2="1024" y2="211.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="411.5" x2="1024" y2="411.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="612.5" x2="1024" y2="612.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="712.5" x2="1024" y2="712.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="812.5" x2="1024" y2="812.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="912.5" x2="1024" y2="912.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="1012.5" x2="1024" y2="1012.5"/><line class="2bdd2c48-ffae-498f-ad39-d60073c06183" y1="511.5" x2="1024" y2="511.5"/><line class="14973f87-b5d9-4fd3-ab5e-085de99cdc5a" x1="713" x2="713" y2="1024"/><line class="14973f87-b5d9-4fd3-ab5e-085de99cdc5a" y1="311.5" x2="1024" y2="311.5"/></g><circle class="e50da5d5-4710-4afe-b349-586036b81e97" cx="713" cy="311.5" r="40"/><path class="e50da5d5-4710-4afe-b349-586036b81e97" d="M713,261.5a50,50,0,1,1-50,50,50,50,0,0,1,50-50m0-15a65,65,0,1,0,65,65,65.07,65.07,0,0,0-65-65Z"/></g></g></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1024 1024"
+   version="1.1"
+   id="svg73"
+   sodipodi:docname="recon.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview75"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.84472656"
+     inkscape:cx="145.60925"
+     inkscape:cy="511.40809"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="e7144b63-2bdd-45c0-a5f8-a70519b44eee" />
+  <defs
+     id="defs8">
+    <style
+       id="style2">.\31 4973f87-b5d9-4fd3-ab5e-085de99cdc5a,.\32 bdd2c48-ffae-498f-ad39-d60073c06183,.\36 8b5564a-1d92-4916-8a35-b0180ac4e006{fill:none;}.e8f9d350-41f8-4b26-ba24-a6cc12555806{clip-path:url(#88744060-c499-46f8-b6d1-db9fe2c2b928);}.e96aa558-f163-412f-bcd4-3fa337824267{fill:#ffe60f;}.f3128be2-ce90-43a3-916d-0e39f634bacf{clip-path:url(#11acdf55-284e-4c7e-ab99-be3443d63127);}.\37 8d4e234-6b10-42a4-87e6-1b9698340498{fill:#16549f;}.\32 bdd2c48-ffae-498f-ad39-d60073c06183{stroke:#139ad2;stroke-width:5px;}.\31 4973f87-b5d9-4fd3-ab5e-085de99cdc5a,.\32 bdd2c48-ffae-498f-ad39-d60073c06183{stroke-miterlimit:10;}.\31 4973f87-b5d9-4fd3-ab5e-085de99cdc5a{stroke:#ee2d24;stroke-width:15px;}.e50da5d5-4710-4afe-b349-586036b81e97{fill:#ee2d24;}</style>
+    <clipPath
+       id="88744060-c499-46f8-b6d1-db9fe2c2b928">
+      <circle
+         id="11735fd1-34fb-48f5-8633-fdbb6061ec4d"
+         data-name="mask"
+         class="68b5564a-1d92-4916-8a35-b0180ac4e006"
+         cx="-532"
+         cy="512"
+         r="512" />
+    </clipPath>
+    <clipPath
+       id="11acdf55-284e-4c7e-ab99-be3443d63127">
+      <circle
+         id="6cd5c944-70fa-477f-b3f0-323beae87cca"
+         data-name="mask"
+         class="68b5564a-1d92-4916-8a35-b0180ac4e006"
+         cx="512.63"
+         cy="512"
+         r="512" />
+    </clipPath>
+  </defs>
+  <title
+     id="title10">recon</title>
+  <g
+     id="91d3ff60-31ab-4d73-bb91-1f8632bb4f8c"
+     data-name="recon">
+    <g
+       class="f3128be2-ce90-43a3-916d-0e39f634bacf"
+       clip-path="url(#11acdf55-284e-4c7e-ab99-be3443d63127)"
+       id="g70">
+      <g
+         id="e7144b63-2bdd-45c0-a5f8-a70519b44eee"
+         data-name="Layer 3 copy"
+         inkscape:label="e7144b63-2bdd-45c0-a5f8-a70519b44eee">
+        <rect
+           id="97e11ddf-2ea8-4f27-907b-9288ddc7e88a"
+           data-name="background"
+           class="78d4e234-6b10-42a4-87e6-1b9698340498"
+           x="0.63"
+           width="1024"
+           height="1024"
+           y="0" />
+        <g
+           id="49c1d5d8-d6af-4e6e-8ac8-e6d78413d5fd"
+           data-name="Layer 6">
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="1013"
+             x2="1013"
+             y2="1024"
+             id="line20"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="913"
+             x2="913"
+             y2="1024"
+             id="line22"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="813"
+             x2="813"
+             y2="1024"
+             id="line24"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="613"
+             x2="613"
+             y2="1024"
+             id="line26"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="412"
+             x2="412"
+             y2="1024"
+             id="line28"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="312"
+             x2="312"
+             y2="1024"
+             id="line30"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="212"
+             x2="212"
+             y2="1024"
+             id="line32"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="112"
+             x2="112"
+             y2="1024"
+             id="line34"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="12"
+             x2="12"
+             y2="1024"
+             id="line36"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             x1="513"
+             x2="513"
+             y2="1024"
+             id="line38"
+             y1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="11.5"
+             x2="1024"
+             y2="11.5"
+             id="line40"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="111.5"
+             x2="1024"
+             y2="111.5"
+             id="line42"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="211.5"
+             x2="1024"
+             y2="211.5"
+             id="line44"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="411.5"
+             x2="1024"
+             y2="411.5"
+             id="line46"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="612.5"
+             x2="1024"
+             y2="612.5"
+             id="line48"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="712.5"
+             x2="1024"
+             y2="712.5"
+             id="line50"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="812.5"
+             x2="1024"
+             y2="812.5"
+             id="line52"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="912.5"
+             x2="1024"
+             y2="912.5"
+             id="line54"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="1012.5"
+             x2="1024"
+             y2="1012.5"
+             id="line56"
+             x1="0" />
+          <line
+             class="2bdd2c48-ffae-498f-ad39-d60073c06183"
+             y1="511.5"
+             x2="1024"
+             y2="511.5"
+             id="line58"
+             x1="0" />
+          <line
+             class="14973f87-b5d9-4fd3-ab5e-085de99cdc5a"
+             x1="713"
+             x2="713"
+             y2="1024"
+             id="line60"
+             y1="0" />
+          <line
+             class="14973f87-b5d9-4fd3-ab5e-085de99cdc5a"
+             y1="311.5"
+             x2="1024"
+             y2="311.5"
+             id="line62"
+             x1="0" />
+        </g>
+        <circle
+           class="e50da5d5-4710-4afe-b349-586036b81e97"
+           cx="713"
+           cy="311.5"
+           r="40"
+           id="circle65"
+           style="fill:#ff0000" />
+        <path
+           class="e50da5d5-4710-4afe-b349-586036b81e97"
+           d="m 713,261.5 a 50,50 0 1 1 -50,50 50,50 0 0 1 50,-50 m 0,-15 a 65,65 0 1 0 65,65 65.07,65.07 0 0 0 -65,-65 z"
+           id="path67"
+           style="fill:#ff0000" />
+      </g>
+    </g>
+  </g>
+  <metadata
+     id="metadata77">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>recon</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

@@ -1426,10 +1426,9 @@
                   <object class="GtkButton" id="engineer_surface_button">
                     <property name="label" translatable="yes">Surface</property>
                     <property name="receives-default">1</property>
-                    <property name="valign">end</property>
-                    <property name="margin-start">50</property>
-                    <property name="margin-end">50</property>
+                    <property name="halign">center</property>
                     <property name="margin-top">15</property>
+                    <property name="width-request">600</property>
                   </object>
                 </child>
               </object>

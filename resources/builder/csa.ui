@@ -136,6 +136,7 @@
                 </child>
                 <child>
                   <object class="GtkLabel" id="captain_map_label">
+                    <property name="height-request">37</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="row">0</property>
@@ -1566,6 +1567,7 @@
                 </child>
                 <child>
                   <object class="GtkLabel" id="radio_engineer_map_label">
+                    <property name="height-request">37</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="row">0</property>

@@ -599,44 +599,17 @@ const char* crop_to_filename(const char *path)
 void update_window_title(Omni *data)
 {
 	GtkWindow *window = GTK_WINDOW(data->gui_elems.window);
-	const char *captain_dropdown_text = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(data->gui_elems.captain_map_dropdown));
-	const char *radio_engineer_dropdown_text = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(data->gui_elems.radio_engineer_map_dropdown));
+	const char *label_text = gtk_label_get_text(GTK_LABEL(data->gui_elems.captain_map_label));
 	
-	char default_title[] = "Captain Sonar Assist";
-	char *title = NULL;
+	const char default_title[] = "Captain Sonar Assist";
+	const char *title = NULL;
 	
-	if(captain_dropdown_text == NULL && radio_engineer_dropdown_text == NULL){
+	if(label_text == NULL || *label_text == '\0'){
 		title = default_title;
-	}else if(captain_dropdown_text == NULL || radio_engineer_dropdown_text == NULL || strcmp(captain_dropdown_text, radio_engineer_dropdown_text) == 0){
-		const char *text = captain_dropdown_text == NULL ? radio_engineer_dropdown_text : captain_dropdown_text;
-		const char prefix[] = "Captain Sonar Assist (";
-		const char end[] = ")";
-		int len = sizeof(prefix) + strlen(text) + sizeof(end) - 1; // -1 because both prefix and end contribute the size of a null char and we only need one
-		title = csa_malloc(len);
-		if(title == NULL){
-			csa_error("failed to allocate memory to construct window title - falling back to default title.\n");
-			title = default_title;
-		}else{
-			memcpy(title, prefix, sizeof(prefix));
-			strcat(title, text);
-			strcat(title, end);
-		}
 	}else{
-		const char prefix[] = "Captain Sonar Assist (";
-		const char sep[] = ", ";
-		const char end[] = ")";
-		int len = sizeof(prefix) + strlen(captain_dropdown_text) + sizeof(sep) + strlen(radio_engineer_dropdown_text) + sizeof(end) - 2; // -2 because all of prefix, sep and end contribute the size of a null char and we only need one
+		size_t len = snprintf(NULL, 0, "%s (%s)", default_title, label_text) + 1;
 		title = csa_malloc(len);
-		if(title == NULL){
-			csa_error("failed to allocate memory to construct window title - falling back to default title.\n");
-			title = default_title;
-		}else{
-			memcpy(title, prefix, sizeof(prefix));
-			strcat(title, captain_dropdown_text);
-			strcat(title, sep);
-			strcat(title, radio_engineer_dropdown_text);
-			strcat(title, end);
-		}
+		snprintf(title, len, "%s (%s)", default_title, label_text);
 	}
 	
 	gtk_window_set_title(window, title);
@@ -646,7 +619,27 @@ void update_window_title(Omni *data)
 	}
 }
 
-static void new_window(GApplication *app, FilesToOpen f)
+void load_map_file(Omni *data, char *f)
+{
+	if(!init_tracker(data, f, FROM_FILE, TRUE)){
+		if(!init_tracker(data, f, FROM_FILE, FALSE)){
+			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
+			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
+		
+			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));
+			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_drawing_area));
+			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_self_tracking));
+		}else{
+			error_popup(data, "Failed to load map '%s' into radio engineer screen.", f);
+			free_tracker(data->captain_tracker);
+		}
+		
+	}else{
+		error_popup(data, "Failed to load map '%s' into captain screen.", f);
+	}
+}
+
+static void new_window(GApplication *app, char *f, char is_builtin)
 {
 	// create program data storage
 	Omni *data = (Omni*)csa_malloc(sizeof(Omni));
@@ -882,10 +875,8 @@ static void new_window(GApplication *app, FilesToOpen f)
 		"clicked", G_CALLBACK(handle_engineer_surface), data
 	);
 	
-	data->gui_elems.captain_map_dropdown = GTK_WIDGET(gtk_builder_get_object(builder,"captain_map_dropdown"));
-	g_signal_connect(data->gui_elems.captain_map_dropdown, "changed", G_CALLBACK(captain_dropdown_fix), data);
-	data->gui_elems.radio_engineer_map_dropdown = GTK_WIDGET(gtk_builder_get_object(builder,"radio_engineer_map_dropdown"));
-	g_signal_connect(data->gui_elems.radio_engineer_map_dropdown, "changed", G_CALLBACK(radio_engineer_dropdown_fix), data);
+	data->gui_elems.captain_map_label = GTK_WIDGET(gtk_builder_get_object(builder,"captain_map_label"));
+	data->gui_elems.radio_engineer_map_label = GTK_WIDGET(gtk_builder_get_object(builder,"radio_engineer_map_label"));
 	
 	g_signal_connect(gtk_builder_get_object(builder,"captain_north"), "clicked", G_CALLBACK(handle_move_captain_NORTH), data);
 	g_signal_connect(gtk_builder_get_object(builder,"captain_east" ), "clicked", G_CALLBACK(handle_move_captain_EAST ), data);
@@ -956,43 +947,60 @@ static void new_window(GApplication *app, FilesToOpen f)
 	data->course_plotter.choosing_captain_starting_pos = TRUE;
 	
 	g_object_unref(builder);
-
-	if(f.type == SAVE_FILE){
-		printf("Temporary error: loading save files is not yet implemented!\n");
-		// when a save file is loaded it should check for a null char at the beginning
-		// since text files such as maps (which are lua scripts) cannot begin with a null
-		// char, thus allowing an error to be raised if the file is not a save file.
-		// (and obviously to support this the save file writer will need to add the null
-		// char at the beginning when writing save files)
-	}else{
-		// if a save file is passed in here, then the lua loader will fail at the beginning null char,
-		// so there is no chance a save could be interpreted as a script. Good luck getting a binary
-		// file past the syntax checker anyway though.
-		if(f.type & LOAD_FIRST){
-			if(!init_tracker(data, f.file1, f.type & STATIC_FIRST ? FROM_STRING : FROM_FILE, TRUE)){
-				GtkComboBox *dropdown = GTK_COMBO_BOX(data->gui_elems.captain_map_dropdown);
-				gtk_combo_box_set_button_sensitivity(dropdown, GTK_SENSITIVITY_OFF);
-				g_signal_handlers_block_by_func(dropdown, (void*)captain_dropdown_fix, data);
-				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(f.file1));
-				gtk_combo_box_set_active(dropdown, 0);
-				g_signal_handlers_unblock_by_func(dropdown, (void*)captain_dropdown_fix, data);
-				gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_drawing_area));
-				gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_self_tracking));
+	
+	if(f != NULL){
+		if(is_builtin){
+			const char *mapname = f;
+			const char prefix[] = RESOURCES_MAPS_BUILTINS;
+			char *path = csa_malloc(strlen(prefix) + strlen(f) + 1);
+			if(path == NULL){
+				csa_error("failed to allocate memory to construct path to map resource for map '%s' in order to load it. Abandoning loading this resource (the tab will be left empty).\n", mapname);
 			}else{
-				error_popup(data, "Failed to load map.");
+				strcpy(path, prefix);
+				strcat(path, mapname);
+				GError *err = NULL;
+				GBytes *map_gbytes = g_resources_lookup_data(path, G_RESOURCE_LOOKUP_FLAGS_NONE, &err);
+				if(err == NULL){
+					gsize s;
+					gpointer map = g_bytes_unref_to_data(map_gbytes, &s);
+					
+					if(!init_tracker(data, map, FROM_STRING, TRUE)){
+						if(!init_tracker(data, map, FROM_STRING, FALSE)){
+							gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
+							gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
+						
+							gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));
+							gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_drawing_area));
+							gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_self_tracking));
+						}else{
+							error_popup(data, "Failed to load builtin map '%s' into radio engineer screen.", f);
+							free_tracker(data->captain_tracker);
+						}
+					}else{
+						error_popup(data, "Failed to load builtin map '%s' into captain screen.", f);
+					}
+					
+					g_free(map);
+				}else{
+					csa_error("failed to get map resource %s: %s\n", mapname, err->message);
+					g_error_free(err);
+				}
+				csa_free(path);
 			}
-		}
-		if(f.type & LOAD_SECOND){
-			if(!init_tracker(data, f.file2, f.type & STATIC_SECOND ? FROM_STRING : FROM_FILE, FALSE)){
-				GtkComboBox *dropdown = GTK_COMBO_BOX(data->gui_elems.radio_engineer_map_dropdown);
-				gtk_combo_box_set_button_sensitivity(dropdown, GTK_SENSITIVITY_OFF);
-				g_signal_handlers_block_by_func(dropdown, (void*)radio_engineer_dropdown_fix, data);
-				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(f.file2));
-				gtk_combo_box_set_active(dropdown, 0);
-				g_signal_handlers_unblock_by_func(dropdown, (void*)radio_engineer_dropdown_fix, data);
-				gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));
+		}else{
+			FILE *fp = fopen(f, "rb");
+			if(fp == NULL){
+				csa_warning("file '%s' could not be opened to check type (save file or map file) so the created window will be left empty.\n", f);
 			}else{
-				error_popup(data, "Failed to load map.");
+				int c = fgetc(fp);
+				if(c == EOF){
+					csa_warning("file '%s' is empty, so cannot be a valid save file or map file, so the created window will be left empty.\n", f);
+				}else if(c == '\0'){ // all save files begin with a null char to allow this to work, since no map file could begin with a null char
+					printf("Temporary error: loading save files is not yet implemented!\n");
+				}else{ // assume it's a map file, let the lua loader handle it if it's not
+					load_map_file(data, f);
+				}
+				fclose(fp);
 			}
 		}
 	}
@@ -1007,7 +1015,7 @@ static void new_window_activate (
 	__attribute__ ((unused)) GVariant *parameter,
 	gpointer user_data
 ) {
-	new_window(G_APPLICATION(user_data), (FilesToOpen){LOAD_NOTHING, NULL, NULL});
+	new_window(G_APPLICATION(user_data), NULL, FALSE);
 }
 
 static void quit_activate (
@@ -1209,26 +1217,19 @@ static void open_map(GApplication *application, GFile **files, int n_files, __at
 	if(fmt != NULL && strcmp(fmt, "help") == 0){
 		char formatters_description[] = 
 			"\033[1mFormat strings\033[0m (for use with -f):\n"
-			"Format strings are parsed on a per-window basis, with windows separated by "
-			"spaces. Each format unit reads the next file path or map name in from the  "
-			"list of files passed as arguments. Valid format units are:\n"
+			"Format strings are parsed on a per-window basis, with one format unit (one character long) per window. "
+			"Each format unit reads the next file path or map name in from the list of files passed as arguments. "
+			"Valid format units are:\n"
 			"\033[1;34m\tn\033[0m: \033[1;33mnew window\033[0m\n"
-			"\033[1;34m\ts\033[0m: \033[1;33mload save file\033[0m\n"
-			"\033[1;34m\tc\033[0m: \033[1;33mload file into captain tab\033[0m\n"
-			"\033[1;34m\tr\033[0m: \033[1;33mload file into radio engineer tab\033[0m\n"
-			"\033[1;34m\tb\033[0m: \033[1;33mload file into both captain and radio engineer tabs\033[0m\n"
-			"The `\033[1;34mc\033[0m`, `\033[1;34mr\033[0m` and `\033[1;34mb\033[0m` format units can be "
-			"prefixed with an `\033[1;34ms\033[0m` to load from the maps built into the program rather "
-			"than an external file (this treats the corresponding argument as a map name rather than "
-			"file path).\n"
+			"\033[1;34m\tf\033[0m: \033[1;33mload file (can be save or map file)\033[0m\n"
+			"\033[1;34m\tb\033[0m: \033[1;33mload built-in map\033[0m\n"
 			"For example:\n"
-			"\t\033[32mcsa \033[33m-f \033[1m\"n scr b s n\" \033[34mAlpha ~/map.lua ~/map2.lua ~/mysave.csa\033[0m\n"
-			"creates an empty window, a window with the inbuilt \033[34mAlpha\033[0m map loaded into the "
-			"Captain tracker and \033[34m~/map.lua\033[0m loaded into the Radio Engineer tracker, a window "
-			"with \033[34m~/map2.lua\033[0m loaded into both the Captain and Radio Engineer trackers, a window "
+			"\t\033[32mcsa \033[33m-f \033[1m\"n b f f f n\" \033[34mAlpha ~/map.lua ~/map2.lua ~/mysave.csa\033[0m\n"
+			"creates an empty window, a window with the inbuilt \033[34mAlpha\033[0m map loaded, a window with"
+			"\033[34m~/map.lua\033[0m loaded, a window with \033[34m~/map2.lua\033[0m loaded, a window "
 			"into which \033[34m~/mysave.csa\033[0m is loaded and another empty window.\n";
 		line_wrap(formatters_description);
-		printf("%s", formatters_description);
+		fprintf(stdout, "%s", formatters_description);
 		return;
 	}
 	
@@ -1236,32 +1237,11 @@ static void open_map(GApplication *application, GFile **files, int n_files, __at
 	int j = 0; // char index in format string
 	if(fmt == NULL){
 		if(n_files == 0){
-			new_window(application, (FilesToOpen){LOAD_NOTHING, NULL, NULL});
+			new_window(application, NULL, FALSE);
 		}else{
 			for(; i < n_files; ++i){
 				char *f = g_file_get_path(files[i]);
-				int action;
-				FILE *fp = fopen(f, "rb");
-				if(fp == NULL){
-					csa_warning("file '%s' could not be opened to check type (save file or map file) so the created window will be left empty.\n", f);
-					g_free(f);
-					f = NULL;
-					action = LOAD_NOTHING;
-				}else{
-					int c = fgetc(fp);
-					if(c == EOF){
-						csa_warning("file '%s' is empty, so cannot be a valid save file or map file, so the created window will be left empty.\n", f);
-						g_free(f);
-						f = NULL;
-						action = LOAD_NOTHING;
-					}else if(c == '\0'){ // all save files begin with a null char to allow this to work, since no map file could begin with a null char
-						action = SAVE_FILE;
-					}else{ // assume it's a map file, let the lua loader handle it if it's not
-						action = LOAD_FIRST | LOAD_SECOND; // load into both captain and radio engineer tabs by default (can use format string to gain more control over this behaviour)
-					}
-					fclose(fp);
-				}
-				new_window(application, (FilesToOpen){action, f, f});
+				new_window(application, f, FALSE); // we assume files passed by CLI are actual files
 				g_free(f);
 			}
 		}
@@ -1269,106 +1249,26 @@ static void open_map(GApplication *application, GFile **files, int n_files, __at
 		while(1){
 			while(fmt[j] == ' ') ++j; // skip any whitespace
 			if(fmt[j] == '\0') break;
-			int ind = j;
-			while(fmt[j] != ' ' && fmt[j] != '\0') ++j; // increment until we either reach whitespace or NULL. format word now has indices current_ind <= ind < j
-			FilesToOpen f = (FilesToOpen){LOAD_NOTHING, NULL, NULL};
-			if(fmt[ind] == 'n'){
-				new_window(application, f);
-				++ind;
-				if(ind != j){
-					csa_warning("format specifier 'n' does not take further modifiers but further modifiers were given.\n");
-				}
-			}else if((fmt[ind] == 's') && (ind + 1 == j)){
-				++ind;
-				f.type = SAVE_FILE;
+			if(fmt[j] == 'n'){
+				new_window(application, NULL, FALSE);
+			}else if(fmt[j] == 'f'){
 				if(i < n_files){
-					f.file1 = g_file_get_path(files[i]);
-					new_window(application, f);
-					g_free(f.file1);
+					char *f = g_file_get_path(files[i]);
+					new_window(application, f, FALSE);
+					g_free(f);
 					++i;
 				}else{
-					csa_warning("format specifier 's' requires a file but too few files were provided. An empty window is being created since a save file was not specified.\n");
+					csa_warning("format specifier 'f' requires a file but too few files were provided. An empty window is being created since a file was not specified.\n");
 				}
+			}else if(fmt[j] == 'b'){
+				char *mapname = g_file_get_basename(files[i]);
+				new_window(application, mapname, TRUE);
+				g_free(mapname);
+				++i;
 			}else{
-				int is_static = FALSE;
-				for(; ind < j; ++ind){
-					if(fmt[ind] == 's'){
-						is_static = TRUE;
-					}else{
-						for(int k = 0; k < 2; ++k){
-							char ch = k == 0 ? 'c' : 'r'; // captain then radio engineer
-							char *tabname = k == 0 ? "captain" : "radio engineer";
-							int load_n = k == 0 ? LOAD_FIRST : LOAD_SECOND;
-							int static_n = k == 0 ? STATIC_FIRST : STATIC_SECOND;
-							
-							if(fmt[ind] == ch || fmt[ind] == 'b'){
-								if(f.type & load_n){
-									csa_warning("file to load for %s tab respecified. Ignoring respecification.%s\n", tabname, fmt[ind] == 'b' ? " (The specified map will still be set for the other tab if it has not been defined yet.)" : "");
-								}else{
-									f.type |= load_n | (is_static ? static_n : 0);
-									if(i < n_files){
-										if(is_static){
-											char *mapname = g_file_get_basename(files[i]);
-											char prefix[] = RESOURCES_MAPS_BUILTINS;
-											char *path = csa_malloc(strlen(prefix) + strlen(mapname) + 1);
-											if(path == NULL){
-												csa_error("failed to allocate memory to construct path to map resource for map '%s' to load into %s tab. Abandoning loading this resource (the tab will be left empty).\n", mapname, tabname);
-												f.type &= ~load_n & ~static_n;
-											}else{
-												strcpy(path, prefix);
-												strcat(path, mapname);
-												GError *err = NULL;
-												GBytes *map_gbytes = g_resources_lookup_data(path, G_RESOURCE_LOOKUP_FLAGS_NONE, &err);
-												if(err == NULL){
-													gsize s;
-													gpointer map = g_bytes_unref_to_data(map_gbytes, &s);
-													if(k == 0){
-														f.file1 = (char*)map;
-													}else{
-														f.file2 = (char*)map;
-													}
-												}else{
-													csa_error("failed to get map resource %s: %s\n", mapname, err->message);
-													g_error_free(err);
-													f.type &= ~load_n & ~static_n;
-												}
-												csa_free(path);
-											}
-											g_free(mapname);
-										}else{
-											if(k == 0){
-												f.file1 = g_file_get_path(files[i]);
-											}else{
-												f.file2 = g_file_get_path(files[i]);
-											}
-										}
-										if(k == 1 || fmt[ind] != 'b'){ // only increment file counter on second use for formatter 'b' (both) since we're reusing the same file to load into both Captain and Radio Engineer
-											++i;
-										}
-									}else{
-										csa_warning("format specifier '%c' requires a file but too few files were provided. As a result the %s tab will not have anything loaded into it.\n", fmt[ind], tabname);
-										f.type &= ~load_n & ~static_n;
-									}
-									if(fmt[ind] != 'b'){
-										is_static = FALSE;
-									}
-								}
-							}else if(fmt[ind] != 'r'){ // we won't catch 'r' until the second iteration, it is still valid
-								csa_warning("invalid format specifier unit '%c' is being ignored.\n", fmt[ind]);
-								break;
-							}
-						}
-					}
-				}
-				new_window(application, f);
-				
-				if(f.file1 != NULL && f.file1 != f.file2){
-					g_free(f.file1);
-				}
-				if(f.file2 != NULL){
-					g_free(f.file2);
-				}
+				csa_warning("ignoring invalid format unit '%c'.\n", fmt[j]);
 			}
+			++j;
 		}
 	}
 	if(i < n_files){

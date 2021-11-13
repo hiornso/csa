@@ -135,12 +135,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkComboBoxText" id="captain_map_dropdown">
-                    <property name="can-focus">0</property>
-                    <property name="button-sensitivity">on</property>
-                    <items>
-                      <item translatable="yes">Open From File</item>
-                    </items>
+                  <object class="GtkLabel" id="captain_map_label">
                     <layout>
                       <property name="column">0</property>
                       <property name="row">0</property>
@@ -1570,12 +1565,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkComboBoxText" id="radio_engineer_map_dropdown">
-                    <property name="can-focus">0</property>
-                    <property name="button-sensitivity">on</property>
-                    <items>
-                      <item translatable="yes">Open From File</item>
-                    </items>
+                  <object class="GtkLabel" id="radio_engineer_map_label">
                     <layout>
                       <property name="column">0</property>
                       <property name="row">0</property>

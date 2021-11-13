@@ -971,13 +971,9 @@ HANDLE_MOVE_RADIO_ENGINEER(EAST)
 HANDLE_MOVE_RADIO_ENGINEER(SOUTH)
 HANDLE_MOVE_RADIO_ENGINEER(WEST)
 
-static void file_select_callback(GtkNativeDialog *native, int response, gpointer user_data, int is_captain)
+static void file_select_callback(GtkNativeDialog *native, int response, gpointer user_data)
 {
 	Omni *data = user_data;
-	
-	GtkWidget *dropdown = is_captain ? data->gui_elems.captain_map_dropdown : data->gui_elems.radio_engineer_map_dropdown;
-	
-	g_signal_handlers_block_by_func(GTK_COMBO_BOX(dropdown), is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
 	
 	if(response == GTK_RESPONSE_ACCEPT){
 		GtkFileChooser *chooser = GTK_FILE_CHOOSER(native);
@@ -987,33 +983,12 @@ static void file_select_callback(GtkNativeDialog *native, int response, gpointer
 		
 		g_object_unref(file);
 		
-		if(!init_tracker(data, filename, FROM_FILE, is_captain)){
-			gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(dropdown), GTK_SENSITIVITY_OFF);
-			gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(filename));
-			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), 0);
-			update_window_title(data);
-			refresh_drawing_areas(data, is_captain);
-		}else{
-			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), -1);
-			error_popup(data, "Failed to load map.");
-		}
+		load_map_file(data, filename);
 		
 		g_free(filename);
-	}else{
-		gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), -1);
 	}
 	
-	g_signal_handlers_unblock_by_func(GTK_COMBO_BOX(dropdown), is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
-
 	g_object_unref(native);
-}
-static void file_select_callback_captain(GtkNativeDialog *native, int response, gpointer user_data)
-{
-	file_select_callback(native, response, user_data, TRUE);
-}
-static void file_select_callback_radio_engineer(GtkNativeDialog *native, int response, gpointer user_data)
-{
-	file_select_callback(native, response, user_data, FALSE);
 }
 
 static int dropdown_fix(GtkComboBoxText *box, gpointer user_data, int is_captain)
@@ -1030,7 +1005,7 @@ static int dropdown_fix(GtkComboBoxText *box, gpointer user_data, int is_captain
 				"_Open",
 				"_Cancel"
 			);
-			g_signal_connect(native, "response", G_CALLBACK(is_captain ? file_select_callback_captain : file_select_callback_radio_engineer), data);
+			g_signal_connect(native, "response", G_CALLBACK(file_select_callback), data);
 			gtk_native_dialog_set_modal(GTK_NATIVE_DIALOG(native), TRUE);
 			gtk_native_dialog_show(GTK_NATIVE_DIALOG(native));
 		}else{
@@ -1070,12 +1045,4 @@ static int dropdown_fix(GtkComboBoxText *box, gpointer user_data, int is_captain
 	g_free(mapname);
 	
 	return 1;
-}
-int captain_dropdown_fix(GtkComboBoxText *box, gpointer user_data)
-{
-	return dropdown_fix(box, user_data, TRUE);
-}
-int radio_engineer_dropdown_fix(GtkComboBoxText *box, gpointer user_data)
-{
-	return dropdown_fix(box, user_data, FALSE);
 }

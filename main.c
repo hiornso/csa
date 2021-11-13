@@ -514,6 +514,107 @@ static int sort_map_names(const void *ptr1, const void *ptr2)
 	return -strcmp(s1, s2);
 }
 
+static const char* crop_to_filename(const char *path)
+{
+	const char *filename = path;
+	for(int i = 0; path[i] != '\0'; ++i){
+		if(path[i] == '/'){
+			filename = path + i + 1;
+		}
+	}
+	return filename;
+}
+
+static void update_window_title(Omni *data)
+{
+	GtkWindow *window = GTK_WINDOW(data->gui_elems.window);
+	const char *label_text = gtk_label_get_text(GTK_LABEL(data->gui_elems.captain_map_label));
+	
+	const char default_title[] = "Captain Sonar Assist";
+	char *title = NULL;
+	
+	if(label_text == NULL || *label_text == '\0'){
+		title = (char*)default_title;
+	}else{
+		size_t len = snprintf(NULL, 0, "%s (%s)", default_title, label_text) + 1;
+		title = csa_malloc(len);
+		snprintf(title, len, "%s (%s)", default_title, label_text);
+	}
+	
+	gtk_window_set_title(window, title);
+	
+	if(title != default_title){
+		csa_free(title);
+	}
+}
+
+static void load_map(Omni *data, const char mode, const char *map, const char *label)
+{
+	if(!init_tracker(data, map, mode, TRUE)){
+		if(!init_tracker(data, map, mode, FALSE)){
+			const char *cropped_label = crop_to_filename(label);
+			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), cropped_label);
+			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), cropped_label);
+			update_window_title(data);
+		
+			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));
+			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_drawing_area));
+			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_self_tracking));
+		}else{
+			error_popup(data, "Failed to load %smap '%s' into radio engineer screen.", mode == FROM_FILE ? "" : "builtin ", label);
+			free_tracker(data->captain_tracker);
+		}
+	}else{
+		error_popup(data, "Failed to load %smap '%s' into captain screen.", mode == FROM_FILE ? "" : "builtin ", label);
+	}
+}
+
+static void file_select_callback(GtkNativeDialog *native, int response, gpointer user_data)
+{
+	Omni *data = user_data;
+	
+	if(response == GTK_RESPONSE_ACCEPT){
+		GtkFileChooser *chooser = GTK_FILE_CHOOSER(native);
+		GFile *file = gtk_file_chooser_get_file(chooser);
+		
+		char *filename = g_file_get_path(file);
+		
+		g_object_unref(file);
+		
+		load_map(data, FROM_FILE, filename, filename);
+		
+		g_free(filename);
+	}
+	
+	g_object_unref(native);
+}
+
+static void load_builtin_map(Omni *data, const char *mapname)
+{
+	const char prefix[] = RESOURCES_MAPS_BUILTINS;
+	char *path = csa_malloc(strlen(prefix) + strlen(mapname) + 1);
+	if(path == NULL){
+		csa_error("failed to allocate memory to construct path to map resource for map '%s' in order to load it. Abandoning loading this resource (the tab will be left empty).\n", mapname);
+	}else{
+		strcpy(path, prefix);
+		strcat(path, mapname);
+		GError *err = NULL;
+		GBytes *map_gbytes = g_resources_lookup_data(path, G_RESOURCE_LOOKUP_FLAGS_NONE, &err);
+		if(err == NULL){
+			gsize s;
+			gpointer map = g_bytes_unref_to_data(map_gbytes, &s);
+			
+			load_map(data, FROM_STRING, map, mapname);
+			
+			g_free(map);
+		}else{
+			csa_error("failed to get map resource %s: %s\n", mapname, err->message);
+			g_error_free(err);
+		}
+		csa_free(path);
+	}
+}
+
 static void not_implemented (
 	__attribute__ ((unused)) GSimpleAction *action,
 	__attribute__ ((unused)) GVariant *parameter,
@@ -567,14 +668,45 @@ static void mines_activate (
 	// TODO: toggle setting in data to reflect whether we should render mines, then trigger map refresh
 }
 
-static void open_menu_activate (
-	GSimpleAction *action,
+static void open_activate (
+	__attribute__ ((unused)) GSimpleAction *action,
+	__attribute__ ((unused)) GVariant *value,
+	gpointer user_data
+) {
+	Omni *data = user_data;
+	
+	if(data->captain_tracker != NULL || data->radio_engineer_tracker != NULL){
+		error_popup(data, "A map has already been loaded.");
+		return;
+	}
+	
+	GtkFileChooserNative *native = gtk_file_chooser_native_new (
+		"Open File",
+		(GtkWindow*)data->gui_elems.window,
+		GTK_FILE_CHOOSER_ACTION_OPEN,
+		"_Open",
+		"_Cancel"
+	);
+	g_signal_connect(native, "response", G_CALLBACK(file_select_callback), data);
+	gtk_native_dialog_set_modal(GTK_NATIVE_DIALOG(native), TRUE);
+	gtk_native_dialog_show(GTK_NATIVE_DIALOG(native));
+}
+
+static void open_builtin_map_activate (
+	__attribute__ ((unused)) GSimpleAction *action,
 	GVariant *value,
 	gpointer user_data
 ) {
-	gchar *v = g_variant_print(value, FALSE);
-	printf("%s\n", v);
-	g_free(v);
+	Omni *data = (Omni*)user_data;
+	
+	if(data->captain_tracker != NULL || data->radio_engineer_tracker != NULL){
+		error_popup(data, "A map has already been loaded.");
+		return;
+	}
+	
+	const gchar *v = g_variant_get_string(value, NULL);
+	load_builtin_map(data, v);
+	g_free((gchar*)v);
 }
 
 static void escape_activate (
@@ -583,60 +715,6 @@ static void escape_activate (
 	gpointer user_data
 ) {
 	reset_ui_action(NULL, user_data);
-}
-
-const char* crop_to_filename(const char *path)
-{
-	const char *filename = path;
-	for(int i = 0; path[i] != '\0'; ++i){
-		if(path[i] == '/'){
-			filename = path + i + 1;
-		}
-	}
-	return filename;
-}
-
-void update_window_title(Omni *data)
-{
-	GtkWindow *window = GTK_WINDOW(data->gui_elems.window);
-	const char *label_text = gtk_label_get_text(GTK_LABEL(data->gui_elems.captain_map_label));
-	
-	const char default_title[] = "Captain Sonar Assist";
-	const char *title = NULL;
-	
-	if(label_text == NULL || *label_text == '\0'){
-		title = default_title;
-	}else{
-		size_t len = snprintf(NULL, 0, "%s (%s)", default_title, label_text) + 1;
-		title = csa_malloc(len);
-		snprintf(title, len, "%s (%s)", default_title, label_text);
-	}
-	
-	gtk_window_set_title(window, title);
-	
-	if(title != default_title){
-		csa_free(title);
-	}
-}
-
-void load_map_file(Omni *data, char *f)
-{
-	if(!init_tracker(data, f, FROM_FILE, TRUE)){
-		if(!init_tracker(data, f, FROM_FILE, FALSE)){
-			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
-			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
-		
-			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));
-			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_drawing_area));
-			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_self_tracking));
-		}else{
-			error_popup(data, "Failed to load map '%s' into radio engineer screen.", f);
-			free_tracker(data->captain_tracker);
-		}
-		
-	}else{
-		error_popup(data, "Failed to load map '%s' into captain screen.", f);
-	}
 }
 
 static void new_window(GApplication *app, char *f, char is_builtin)
@@ -748,8 +826,7 @@ static void new_window(GApplication *app, char *f, char is_builtin)
 	
 	// menu action-callback linking stuff, blatantly stolen from an example gtk4 program.
 	const GActionEntry window_entries[] = {
-		//{ "open-map",   not_implemented, "s", "''", NULL, PADDING },
-		{ "open",              not_implemented, NULL, NULL, NULL, PADDING },
+		{ "open",              open_activate,   NULL, NULL, NULL, PADDING },
 		{ "save",              not_implemented, NULL, NULL, NULL, PADDING },
 		{ "save-as",           not_implemented, NULL, NULL, NULL, PADDING },
 		{ "close-window",      close_activate,  NULL, NULL, NULL, PADDING },
@@ -774,7 +851,7 @@ static void new_window(GApplication *app, char *f, char is_builtin)
 	GSimpleAction *open_builtin_map_action = g_simple_action_new("open-map", G_VARIANT_TYPE("s"));
 	g_action_map_add_action(G_ACTION_MAP(window), G_ACTION(open_builtin_map_action));
 	g_object_unref(open_builtin_map_action);
-	g_signal_connect(open_builtin_map_action, "activate", G_CALLBACK(open_menu_activate), data);
+	g_signal_connect(open_builtin_map_action, "activate", G_CALLBACK(open_builtin_map_activate), data);
 	
 	gtk_application_window_set_show_menubar(GTK_APPLICATION_WINDOW(window), TRUE);
 	
@@ -950,43 +1027,7 @@ static void new_window(GApplication *app, char *f, char is_builtin)
 	
 	if(f != NULL){
 		if(is_builtin){
-			const char *mapname = f;
-			const char prefix[] = RESOURCES_MAPS_BUILTINS;
-			char *path = csa_malloc(strlen(prefix) + strlen(f) + 1);
-			if(path == NULL){
-				csa_error("failed to allocate memory to construct path to map resource for map '%s' in order to load it. Abandoning loading this resource (the tab will be left empty).\n", mapname);
-			}else{
-				strcpy(path, prefix);
-				strcat(path, mapname);
-				GError *err = NULL;
-				GBytes *map_gbytes = g_resources_lookup_data(path, G_RESOURCE_LOOKUP_FLAGS_NONE, &err);
-				if(err == NULL){
-					gsize s;
-					gpointer map = g_bytes_unref_to_data(map_gbytes, &s);
-					
-					if(!init_tracker(data, map, FROM_STRING, TRUE)){
-						if(!init_tracker(data, map, FROM_STRING, FALSE)){
-							gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
-							gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), f);
-						
-							gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));
-							gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_drawing_area));
-							gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.captain_self_tracking));
-						}else{
-							error_popup(data, "Failed to load builtin map '%s' into radio engineer screen.", f);
-							free_tracker(data->captain_tracker);
-						}
-					}else{
-						error_popup(data, "Failed to load builtin map '%s' into captain screen.", f);
-					}
-					
-					g_free(map);
-				}else{
-					csa_error("failed to get map resource %s: %s\n", mapname, err->message);
-					g_error_free(err);
-				}
-				csa_free(path);
-			}
+			load_builtin_map(data, f);
 		}else{
 			FILE *fp = fopen(f, "rb");
 			if(fp == NULL){
@@ -998,7 +1039,7 @@ static void new_window(GApplication *app, char *f, char is_builtin)
 				}else if(c == '\0'){ // all save files begin with a null char to allow this to work, since no map file could begin with a null char
 					printf("Temporary error: loading save files is not yet implemented!\n");
 				}else{ // assume it's a map file, let the lua loader handle it if it's not
-					load_map_file(data, f);
+					load_map(data, FROM_FILE, f, f);
 				}
 				fclose(fp);
 			}

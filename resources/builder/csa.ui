@@ -135,12 +135,8 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkComboBoxText" id="captain_map_dropdown">
-                    <property name="can-focus">0</property>
-                    <property name="button-sensitivity">on</property>
-                    <items>
-                      <item translatable="yes">Open From File</item>
-                    </items>
+                  <object class="GtkLabel" id="captain_map_label">
+                    <property name="height-request">37</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="row">0</property>
@@ -233,6 +229,9 @@
                     <property name="height-request">30</property>
                     <property name="can-focus">0</property>
                     <property name="active">0</property>
+                    <property name="margin-top">10</property>
+                    <property name="margin-start">10</property>
+                    <property name="margin-end">10</property>
                     <items>
                       <item translatable="yes">Kraken Missile</item>
                       <item translatable="yes">Kaos Polarizing Mine</item>
@@ -251,25 +250,27 @@
                 </child>
                 <child>
                   <object class="GtkGrid">
-                    <property name="vexpand">1</property>
                     <property name="can-focus">0</property>
                     <property name="margin-top">10</property>
                     <property name="margin-bottom">10</property>
                     <property name="row-homogeneous">1</property>
                     <property name="column-homogeneous">1</property>
-                    <property name="row-spacing">5</property>
+                    <property name="row-spacing">10</property>
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/torpedo128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/svgs/torpedo.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Torpedo</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -302,15 +303,18 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/mine128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/svgs/mine.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Mine</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -343,15 +347,18 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/recon128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/svgs/recon.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Drone</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -384,15 +391,18 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/sonar128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/svgs/sonar.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Sonar</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -425,15 +435,18 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/silence128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/svgs/silence.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Silence</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -466,15 +479,18 @@
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
-                        <property name="halign">center</property>
-                        <property name="valign">center</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkImage">
+                          <object class="GtkPicture">
                             <property name="can-focus">0</property>
                             <property name="margin-bottom">10</property>
-                            <property name="resource">/images/first-mate/pngs/special128.png</property>
-                            <property name="pixel-size">128</property>
+                            <property name="file">resource://images/first-mate/svgs/special.svg</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Special Weapon</property>
+                            <property name="margin-bottom">10</property>
                           </object>
                         </child>
                         <child>
@@ -526,6 +542,9 @@
                 <child>
                   <object class="GtkBox">
                     <property name="can-focus">0</property>
+                    <property name="spacing">5</property>
+                    <property name="margin-start">5</property>
+                    <property name="margin-end">5</property>
                     <child>
                       <object class="GtkBox">
                         <property name="can-focus">0</property>
@@ -1405,10 +1424,9 @@
                   <object class="GtkButton" id="engineer_surface_button">
                     <property name="label" translatable="yes">Surface</property>
                     <property name="receives-default">1</property>
-                    <property name="valign">end</property>
-                    <property name="margin-start">50</property>
-                    <property name="margin-end">50</property>
+                    <property name="halign">center</property>
                     <property name="margin-top">15</property>
+                    <property name="width-request">600</property>
                   </object>
                 </child>
               </object>
@@ -1548,12 +1566,8 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkComboBoxText" id="radio_engineer_map_dropdown">
-                    <property name="can-focus">0</property>
-                    <property name="button-sensitivity">on</property>
-                    <items>
-                      <item translatable="yes">Open From File</item>
-                    </items>
+                  <object class="GtkLabel" id="radio_engineer_map_label">
+                    <property name="height-request">37</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="row">0</property>

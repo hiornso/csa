@@ -131,7 +131,7 @@ void radio_engineer_action_motion(GtkEventControllerMotion *gesture, double x, d
 void confirm_captain_action(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data);
 void confirm_radio_engineer_action(GtkGestureClick *gesture, int n_press, double x, double y, gpointer user_data);
 
-int init_tracker(Omni *data, char *lua_map_script_filename, char mode, char is_captain);
+int init_tracker(Omni *data, const char *lua_map_script_filename, const char mode, const char is_captain);
 
 int handle_move_captain_NORTH(GtkButton *button, gpointer user_data);
 int handle_move_captain_EAST (GtkButton *button, gpointer user_data);
@@ -142,8 +142,5 @@ int handle_move_radio_engineer_NORTH(GtkButton *button, gpointer user_data);
 int handle_move_radio_engineer_EAST (GtkButton *button, gpointer user_data);
 int handle_move_radio_engineer_SOUTH(GtkButton *button, gpointer user_data);
 int handle_move_radio_engineer_WEST (GtkButton *button, gpointer user_data);
-
-int captain_dropdown_fix(GtkComboBoxText *box, gpointer user_data);
-int radio_engineer_dropdown_fix(GtkComboBoxText *box, gpointer user_data);
 
 #endif

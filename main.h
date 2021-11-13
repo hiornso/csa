@@ -24,7 +24,7 @@ typedef struct gui_elems {
 	
 	GtkWidget *captain_drawing_area;
 	GtkWidget *captain_self_tracking;
-	GtkWidget *captain_map_dropdown;
+	GtkWidget *captain_map_label;
 	GtkWidget *captain_map_ui_box;
 	GtkWidget *captain_map_builtin_button_grid;
 	
@@ -79,7 +79,7 @@ typedef struct gui_elems {
 	
 	
 	GtkWidget *radio_engineer_drawing_area;
-	GtkWidget *radio_engineer_map_dropdown;
+	GtkWidget *radio_engineer_map_label;
 	GtkWidget *radio_engineer_map_ui_box;
 	GtkWidget *radio_engineer_map_builtin_button_grid;
 	
@@ -260,20 +260,6 @@ typedef struct cliopts {
 	gchar *format;
 } CmdLineOptions;
 
-enum map_init_type {
-	LOAD_NOTHING  = 0,
-	SAVE_FILE     = 1<<0,
-	STATIC_FIRST  = 1<<1,
-	STATIC_SECOND = 1<<2,
-	LOAD_FIRST    = 1<<3,
-	LOAD_SECOND   = 1<<4
-};
-typedef struct files_to_open {
-	enum map_init_type type;
-	char *file1;
-	char *file2;
-} FilesToOpen;
-
 typedef struct course_plotter {
 	StateListNode *position_history;
 	/*
@@ -297,11 +283,10 @@ typedef struct omni {
 } Omni;
 
 // prototypes
+
 void error_popup(Omni *data, char *fmt, ...);
 void free_linked_changes(ChangeListNode *node);
 void free_linked_states(StateListNode *node);
 int add_state(Omni *data, long long elem);
-const char* crop_to_filename(const char *path);
-void update_window_title(Omni *data);
 
 #endif

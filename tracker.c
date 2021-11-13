@@ -38,7 +38,7 @@ void free_tracker(Tracker *t)
 	csa_free(t);
 }
 
-static Tracker* new_tracker(char *lua_map_script, char mode)
+static Tracker* new_tracker(const char *lua_map_script, const char mode)
 {
 	Tracker *t = csa_malloc(sizeof(Tracker));
 	if(t == NULL){
@@ -741,7 +741,7 @@ static int construct_ui(Omni *data, lua_State *L, int is_captain)
 	return 0;
 }
 
-int init_tracker(Omni *data, char *lua_map_script_filename, char mode, char is_captain)
+int init_tracker(Omni *data, const char *lua_map_script_filename, const char mode, const char is_captain)
 {
 	Tracker *tracker = new_tracker(lua_map_script_filename, mode);
 	if(tracker == NULL){
@@ -970,112 +970,3 @@ HANDLE_MOVE_RADIO_ENGINEER(NORTH)
 HANDLE_MOVE_RADIO_ENGINEER(EAST)
 HANDLE_MOVE_RADIO_ENGINEER(SOUTH)
 HANDLE_MOVE_RADIO_ENGINEER(WEST)
-
-static void file_select_callback(GtkNativeDialog *native, int response, gpointer user_data, int is_captain)
-{
-	Omni *data = user_data;
-	
-	GtkWidget *dropdown = is_captain ? data->gui_elems.captain_map_dropdown : data->gui_elems.radio_engineer_map_dropdown;
-	
-	g_signal_handlers_block_by_func(GTK_COMBO_BOX(dropdown), is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
-	
-	if(response == GTK_RESPONSE_ACCEPT){
-		GtkFileChooser *chooser = GTK_FILE_CHOOSER(native);
-		GFile *file = gtk_file_chooser_get_file(chooser);
-
-		char *filename = g_file_get_path(file);
-		
-		g_object_unref(file);
-		
-		if(!init_tracker(data, filename, FROM_FILE, is_captain)){
-			gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(dropdown), GTK_SENSITIVITY_OFF);
-			gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(dropdown), crop_to_filename(filename));
-			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), 0);
-			update_window_title(data);
-			refresh_drawing_areas(data, is_captain);
-		}else{
-			gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), -1);
-			error_popup(data, "Failed to load map.");
-		}
-		
-		g_free(filename);
-	}else{
-		gtk_combo_box_set_active(GTK_COMBO_BOX(dropdown), -1);
-	}
-	
-	g_signal_handlers_unblock_by_func(GTK_COMBO_BOX(dropdown), is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
-
-	g_object_unref(native);
-}
-static void file_select_callback_captain(GtkNativeDialog *native, int response, gpointer user_data)
-{
-	file_select_callback(native, response, user_data, TRUE);
-}
-static void file_select_callback_radio_engineer(GtkNativeDialog *native, int response, gpointer user_data)
-{
-	file_select_callback(native, response, user_data, FALSE);
-}
-
-static int dropdown_fix(GtkComboBoxText *box, gpointer user_data, int is_captain)
-{
-	Omni *data = user_data;
-	
-	char *mapname = gtk_combo_box_text_get_active_text(box);
-	if(mapname != NULL){
-		if(strcmp(mapname, "Open From File") == 0){
-			GtkFileChooserNative *native = gtk_file_chooser_native_new (
-				"Open File",
-				(GtkWindow*)data->gui_elems.window,
-				GTK_FILE_CHOOSER_ACTION_OPEN,
-				"_Open",
-				"_Cancel"
-			);
-			g_signal_connect(native, "response", G_CALLBACK(is_captain ? file_select_callback_captain : file_select_callback_radio_engineer), data);
-			gtk_native_dialog_set_modal(GTK_NATIVE_DIALOG(native), TRUE);
-			gtk_native_dialog_show(GTK_NATIVE_DIALOG(native));
-		}else{
-			char prefix[] = RESOURCES_MAPS_BUILTINS;
-			char *path = csa_malloc(strlen(prefix) + strlen(mapname) + 1);
-			if(path == NULL){
-				csa_error("failed to allocate memory to construct path to map resource for map '%s' for %s tracker.\n", mapname, is_captain ? "captain" : "radio engineer");
-				error_popup(data, "Failed to allocate memory to construct path to map resource.");
-			}else{
-				strcpy(path, prefix);
-				strcat(path, mapname);
-				GError *err = NULL;
-				GBytes *map_gbytes = g_resources_lookup_data(path, G_RESOURCE_LOOKUP_FLAGS_NONE, &err);
-				if(err == NULL){
-					gsize s;
-					gpointer map = g_bytes_unref_to_data(map_gbytes, &s);
-					if(!init_tracker(data, (char*)map, FROM_STRING, is_captain)){
-						gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(box), GTK_SENSITIVITY_OFF);
-						update_window_title(data);
-						refresh_drawing_areas(data, is_captain);
-					}else{
-						g_signal_handlers_block_by_func(box, is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
-						gtk_combo_box_set_active(GTK_COMBO_BOX(box), -1);
-						g_signal_handlers_unblock_by_func(box, is_captain ? (void*)captain_dropdown_fix : (void*)radio_engineer_dropdown_fix, user_data);
-						error_popup(data, "Failed to load static map.");
-					}
-					g_free(map);
-				}else{
-					csa_error("failed to get map resource for %s tracker: %s\n", is_captain ? "captain" : "radio engineer", err->message);
-					g_error_free(err);
-					error_popup(data, "Failed to load map.");
-				}
-			}
-			csa_free(path);
-		}
-	}
-	g_free(mapname);
-	
-	return 1;
-}
-int captain_dropdown_fix(GtkComboBoxText *box, gpointer user_data)
-{
-	return dropdown_fix(box, user_data, TRUE);
-}
-int radio_engineer_dropdown_fix(GtkComboBoxText *box, gpointer user_data)
-{
-	return dropdown_fix(box, user_data, FALSE);
-}

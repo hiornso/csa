@@ -567,6 +567,16 @@ static void mines_activate (
 	// TODO: toggle setting in data to reflect whether we should render mines, then trigger map refresh
 }
 
+static void open_menu_activate (
+	GSimpleAction *action,
+	GVariant *value,
+	gpointer user_data
+) {
+	gchar *v = g_variant_print(value, FALSE);
+	printf("%s\n", v);
+	g_free(v);
+}
+
 static void escape_activate (
 	__attribute__ ((unused)) GSimpleAction *action,
 	__attribute__ ((unused)) GVariant *parameter,
@@ -745,6 +755,7 @@ static void new_window(GApplication *app, FilesToOpen f)
 	
 	// menu action-callback linking stuff, blatantly stolen from an example gtk4 program.
 	const GActionEntry window_entries[] = {
+		//{ "open-map",   not_implemented, "s", "''", NULL, PADDING },
 		{ "open",              not_implemented, NULL, NULL, NULL, PADDING },
 		{ "save",              not_implemented, NULL, NULL, NULL, PADDING },
 		{ "save-as",           not_implemented, NULL, NULL, NULL, PADDING },
@@ -766,6 +777,11 @@ static void new_window(GApplication *app, FilesToOpen f)
 	g_action_map_add_action(G_ACTION_MAP(window), G_ACTION(toggle_mine_layer_action));
 	g_object_unref(toggle_mine_layer_action);
 	g_signal_connect(toggle_mine_layer_action, "change-state", G_CALLBACK(mines_activate), data);
+	
+	GSimpleAction *open_builtin_map_action = g_simple_action_new("open-map", G_VARIANT_TYPE("s"));
+	g_action_map_add_action(G_ACTION_MAP(window), G_ACTION(open_builtin_map_action));
+	g_object_unref(open_builtin_map_action);
+	g_signal_connect(open_builtin_map_action, "activate", G_CALLBACK(open_menu_activate), data);
 	
 	gtk_application_window_set_show_menubar(GTK_APPLICATION_WINDOW(window), TRUE);
 	
@@ -870,33 +886,6 @@ static void new_window(GApplication *app, FilesToOpen f)
 	g_signal_connect(data->gui_elems.captain_map_dropdown, "changed", G_CALLBACK(captain_dropdown_fix), data);
 	data->gui_elems.radio_engineer_map_dropdown = GTK_WIDGET(gtk_builder_get_object(builder,"radio_engineer_map_dropdown"));
 	g_signal_connect(data->gui_elems.radio_engineer_map_dropdown, "changed", G_CALLBACK(radio_engineer_dropdown_fix), data);
-	
-	GError *err = NULL;
-	char **names = g_resources_enumerate_children(RESOURCES_MAPS_BUILTINS, G_RESOURCE_LOOKUP_FLAGS_NONE, &err);
-	if(err == NULL){
-		int len = 0;
-		for(;names[len] != NULL; ++len);
-		char **sorted_names = csa_malloc(sizeof(char*) * len);
-		if(sorted_names == NULL){
-			csa_warning("failed to allocate memory to sort static map names, so they are being left unsorted.\n");
-			for(int i = 0; names[i] != NULL; ++i){
-				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.captain_map_dropdown), names[i]);
-				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.radio_engineer_map_dropdown), names[i]);
-			}
-		}else{
-			memcpy(sorted_names, names, sizeof(char*) * len);
-			qsort(sorted_names, len, sizeof(char*), sort_map_names);
-			for(int i = 0; i < len; ++i){
-				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.captain_map_dropdown), sorted_names[i]);
-				gtk_combo_box_text_prepend_text(GTK_COMBO_BOX_TEXT(data->gui_elems.radio_engineer_map_dropdown), sorted_names[i]);
-			}
-			csa_free(sorted_names);
-		}
-	}else{
-		csa_error("failed to load static maps: %s\n",err->message);
-		g_error_free(err);
-	}
-	g_strfreev(names);
 	
 	g_signal_connect(gtk_builder_get_object(builder,"captain_north"), "clicked", G_CALLBACK(handle_move_captain_NORTH), data);
 	g_signal_connect(gtk_builder_get_object(builder,"captain_east" ), "clicked", G_CALLBACK(handle_move_captain_EAST ), data);
@@ -1159,6 +1148,41 @@ static void initialise_application(GApplication *app, __attribute__ ((unused)) g
 	// this could be done automatically by placing the menu resource at /com/csa/gtk/menus.ui but this way seems clearer
 	GtkBuilder *builder = gtk_builder_new_from_resource("/builder/menu.ui");
 	GMenuModel *model = G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
+	GMenuModel *open_builtin_map_model = G_MENU_MODEL(gtk_builder_get_object(builder, "open_builtin_map_menu"));
+	
+	GError *err = NULL;
+	char **names = g_resources_enumerate_children(RESOURCES_MAPS_BUILTINS, G_RESOURCE_LOOKUP_FLAGS_NONE, &err);
+	if(err == NULL){
+		int len = 0;
+		for(;names[len] != NULL; ++len);
+		char **sorted_names = csa_malloc(sizeof(char*) * len);
+		if(sorted_names == NULL){
+			csa_error("failed to allocate memory to sort static map names, so they are being left unsorted.\n");
+			for(int i = 0; names[i] != NULL; ++i){
+				GVariant *v = g_variant_new_string(names[i]);
+				GMenuItem *m = g_menu_item_new(names[i], NULL);
+				g_menu_item_set_action_and_target_value(G_MENU_ITEM(m), "win.open-map", v);
+				g_menu_prepend_item(G_MENU(open_builtin_map_model), m);
+				g_object_unref(m);
+			}
+		}else{
+			memcpy(sorted_names, names, sizeof(char*) * len);
+			qsort(sorted_names, len, sizeof(char*), sort_map_names);
+			for(int i = 0; i < len; ++i){
+				GVariant *v = g_variant_new_string(sorted_names[i]);
+				GMenuItem *m = g_menu_item_new(sorted_names[i], NULL);
+				g_menu_item_set_action_and_target_value(G_MENU_ITEM(m), "win.open-map", v);
+				g_menu_prepend_item(G_MENU(open_builtin_map_model), m);
+				g_object_unref(m);
+			}
+			csa_free(sorted_names);
+		}
+	}else{
+		csa_error("failed to load static maps: %s\n",err->message);
+		g_error_free(err);
+	}
+	g_strfreev(names);
+	
 	gtk_application_set_menubar(GTK_APPLICATION(app), model);
 	g_object_unref(builder);
 }

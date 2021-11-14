@@ -554,7 +554,7 @@ static void load_map(Omni *data, const char mode, const char *map, const char *l
 		if(!init_tracker(data, map, mode, FALSE)){
 			const char *cropped_label = crop_to_filename(label);
 			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), cropped_label);
-			gtk_label_set_text(GTK_LABEL(data->gui_elems.captain_map_label), cropped_label);
+			gtk_label_set_text(GTK_LABEL(data->gui_elems.radio_engineer_map_label), cropped_label);
 			update_window_title(data);
 		
 			gtk_widget_queue_draw(GTK_WIDGET(data->gui_elems.radio_engineer_drawing_area));

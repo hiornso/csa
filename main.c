@@ -1249,10 +1249,104 @@ static void line_wrap(char *str)
 	}
 }
 
-static void open_map(GApplication *application, GFile **files, int n_files, __attribute__ ((unused)) char *hint, gpointer user_data)
+static int handle_cmdline_args(GApplication *application, GApplicationCommandLine* cmdline, __attribute__((unused)) gpointer user_data)
+{
+	char *fmt;
+	GVariantDict *dict = g_application_command_line_get_options_dict(cmdline);
+	
+	if(!g_variant_dict_lookup(dict, "format", "&s", &fmt)){
+		fmt = NULL;
+	}
+	
+	gint argc;
+	gchar **argv = g_application_command_line_get_arguments(cmdline, &argc);
+	gchar **arguments = argv + 1; // skip over executable basename
+	
+	const int n_files = argc - 1;
+	
+	if(g_application_command_line_get_is_remote(cmdline)){
+		FILE *out = stdout;
+		fprintf(out, "\033[1;96mInfo: \033[0mA new instance has made a request. <format='%s' args=[", fmt);
+		for(int i = 0; i < n_files - 1; ++i){
+			fprintf(out, "'%s', ", arguments[i]);
+		}
+		fprintf(out, "'%s']>\n", arguments[n_files - 1]);
+		
+		g_application_command_line_print(cmdline, "\033[1;96mInfo: \033[0mThe request has been dispatched to the existing instance.\n");
+	}
+	
+	GFile *file;
+	
+	int i = 0; // file index in file array
+	int j = 0; // char index in format string
+	if(fmt == NULL){
+		if(n_files == 0){
+			new_window(application, NULL, FALSE);
+		}else{
+			for(; i < n_files; ++i){
+				file = g_application_command_line_create_file_for_arg(cmdline, arguments[i]);
+				char *f = g_file_get_path(file);
+				g_object_unref(file);
+				
+				new_window(application, f, FALSE); // we assume files passed by CLI are actual files
+				g_free(f);
+			}
+		}
+	}else{
+		while(1){
+			while(fmt[j] == ' ') ++j; // skip any whitespace
+			if(fmt[j] == '\0') break;
+			if(fmt[j] == 'n'){
+				new_window(application, NULL, FALSE);
+			}else if(fmt[j] == 'f'){
+				if(i < n_files){
+					file = g_application_command_line_create_file_for_arg(cmdline, arguments[i]);
+					char *f = g_file_get_path(file);
+					g_object_unref(file);
+					
+					new_window(application, f, FALSE);
+					g_free(f);
+					++i;
+				}else{
+					csa_warning("format specifier 'f' requires a file but too few files were provided. This format specifier is being ignored.\n");
+				}
+			}else if(fmt[j] == 'b'){
+				char *mapname = arguments[i];
+				new_window(application, mapname, TRUE);
+				++i;
+			}else{
+				csa_warning("ignoring invalid format specifier '%c'.\n", fmt[j]);
+			}
+			++j;
+		}
+	}
+	if(i < n_files){
+		file = g_application_command_line_create_file_for_arg(cmdline, arguments[i]);
+		char *filename = g_file_get_path(file);
+		g_object_unref(file);
+		
+		csa_warning("too many files passed, discarding file '%s' and those after it due to not being specified in the format string.\n", filename);
+		g_free(filename);
+	}
+	
+	g_strfreev(argv);
+	
+	return 0;
+}
+
+static int handle_local_cmdline_args(__attribute__ ((unused)) GApplication *application, GVariantDict *dict, gpointer user_data)
 {
 	CmdLineOptions *options = (CmdLineOptions*)user_data;
-
+	
+	if(options->print_version){
+		fprintf(stdout,
+			"CSA " VERSION_STRING " " SYSTEM_INFO_STRING "\nCSA built using " COMPILER " (" __VERSION__ ") at " __DATE__ " " __TIME__ " for platform " PLATFORM "\nGTK %i.%i.%i\nGLib %i.%i.%i\n",
+			GTK_GLIB_VERSIONS
+		);
+		
+		return 0;
+	}
+	
 	char *fmt = options->format;
 	
 	if(fmt != NULL && strcmp(fmt, "help") == 0){
@@ -1271,71 +1365,11 @@ static void open_map(GApplication *application, GFile **files, int n_files, __at
 			"into which \033[34m~/mysave.csa\033[0m is loaded and another empty window.\n";
 		line_wrap(formatters_description);
 		fprintf(stdout, "%s", formatters_description);
-		return;
-	}
-	
-	int i = 0; // file index in file array
-	int j = 0; // char index in format string
-	if(fmt == NULL){
-		if(n_files == 0){
-			new_window(application, NULL, FALSE);
-		}else{
-			for(; i < n_files; ++i){
-				char *f = g_file_get_path(files[i]);
-				new_window(application, f, FALSE); // we assume files passed by CLI are actual files
-				g_free(f);
-			}
-		}
-	}else{
-		while(1){
-			while(fmt[j] == ' ') ++j; // skip any whitespace
-			if(fmt[j] == '\0') break;
-			if(fmt[j] == 'n'){
-				new_window(application, NULL, FALSE);
-			}else if(fmt[j] == 'f'){
-				if(i < n_files){
-					char *f = g_file_get_path(files[i]);
-					new_window(application, f, FALSE);
-					g_free(f);
-					++i;
-				}else{
-					csa_warning("format specifier 'f' requires a file but too few files were provided. An empty window is being created since a file was not specified.\n");
-				}
-			}else if(fmt[j] == 'b'){
-				char *mapname = g_file_get_basename(files[i]);
-				new_window(application, mapname, TRUE);
-				g_free(mapname);
-				++i;
-			}else{
-				csa_warning("ignoring invalid format unit '%c'.\n", fmt[j]);
-			}
-			++j;
-		}
-	}
-	if(i < n_files){
-		char *filename = g_file_get_path(files[i]);
-		csa_warning("too many files passed, discarding file '%s' and those after it due to not being specified in the format string.\n", filename);
-		g_free(filename);
-	}
-	
-}
-
-static void activate(GApplication *application, gpointer user_data)
-{
-	open_map(application, NULL, 0, NULL, user_data);
-}
-
-static int handle_cmdline_args(__attribute__ ((unused)) GApplication *application, __attribute__ ((unused)) GVariantDict *options_dict, gpointer user_data)
-{
-	CmdLineOptions *options = (CmdLineOptions*)user_data;
-	
-	if(options->print_version){
-		fprintf(stdout,
-			"CSA " VERSION_STRING " " SYSTEM_INFO_STRING "\nCSA built using " COMPILER " (" __VERSION__ ") at " __DATE__ " " __TIME__ " for platform " PLATFORM "\nGTK %i.%i.%i\nGLib %i.%i.%i\n",
-			GTK_GLIB_VERSIONS
-		);
-		
 		return 0;
+	}
+	
+	if(options->format != NULL){
+		g_variant_dict_insert(dict, "format", "&s", options->format);
 	}
 	
 	return -1;
@@ -1343,7 +1377,7 @@ static int handle_cmdline_args(__attribute__ ((unused)) GApplication *applicatio
 
 int main(int argc, char *argv[])
 {
-	GtkApplication *app = gtk_application_new(CSA_APPLICATION_ID ,G_APPLICATION_HANDLES_OPEN);
+	GtkApplication *app = gtk_application_new(CSA_APPLICATION_ID, G_APPLICATION_HANDLES_COMMAND_LINE);
 	
 	CmdLineOptions cmd_line_options = (CmdLineOptions){FALSE, NULL};
 	const GOptionEntry options[] = {
@@ -1371,6 +1405,7 @@ int main(int argc, char *argv[])
 		},
 		{ NULL, 0, 0, 0, NULL, NULL, NULL }
 	};
+	
 	g_application_add_main_option_entries(G_APPLICATION(app), options);
 	g_application_set_option_context_summary(G_APPLICATION(app), "A program about tracking a submarine.");
 	char csa_description[] =
@@ -1390,9 +1425,8 @@ int main(int argc, char *argv[])
 	g_application_set_option_context_parameter_string(G_APPLICATION(app), "[FILES…]");
 	
 	g_signal_connect(app, "startup", G_CALLBACK(initialise_application), NULL);
-	g_signal_connect(app, "activate", G_CALLBACK(activate), &cmd_line_options);
-	g_signal_connect(app, "open", G_CALLBACK(open_map), &cmd_line_options);
-	g_signal_connect(app, "handle-local-options", G_CALLBACK(handle_cmdline_args), &cmd_line_options);
+	g_signal_connect(app, "handle-local-options", G_CALLBACK(handle_local_cmdline_args), &cmd_line_options);
+	g_signal_connect(app, "command-line", G_CALLBACK(handle_cmdline_args), NULL);
 	
 	int status = g_application_run(G_APPLICATION (app), argc, argv);
 	

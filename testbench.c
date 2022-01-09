@@ -23,6 +23,8 @@ void update_window_title(__attribute__ ((unused)) Omni *data) {}
 
 int main()
 {
+	init_accelerate();
+	
 	gtk_init();
 	GtkWidget *dummy = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	

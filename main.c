@@ -10,6 +10,7 @@
 #include "firstmate.h"
 #include "tracker.h"
 #include "csa_error.h"
+#include "accelerated.h"
 
 #define SQUARE(x) ((x)*(x))
 #define PADDING {0}
@@ -1377,6 +1378,8 @@ static int handle_local_cmdline_args(__attribute__ ((unused)) GApplication *appl
 
 int main(int argc, char *argv[])
 {
+	init_accelerate();
+	
 	GtkApplication *app = gtk_application_new(CSA_APPLICATION_ID, G_APPLICATION_HANDLES_COMMAND_LINE);
 	
 	CmdLineOptions cmd_line_options = (CmdLineOptions){FALSE, NULL};

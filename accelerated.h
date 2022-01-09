@@ -4,13 +4,15 @@
 #include "tracker.h"
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
+
 int bicubic(float *small, int s, float *big, int res, int offset);
+void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int stride, int layerCount, int layerSize);
+void init_accelerate();
 
 #ifdef __cplusplus
-extern "C"
+}
 #endif
-void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int stride, int layerCount, int layerSize);
 
 #endif

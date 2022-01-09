@@ -1,10 +1,16 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <stdatomic.h>
+#include <semaphore.h>
+
+extern "C" {
 
 #include "main.h"
 #include "tracker.h"
 #include "accelerated.h"
+#include "csa_error.h"
 
+}
 
 #define USE_MULTITHREADING 1
 #ifndef USE_VECTORS
@@ -48,13 +54,14 @@ typedef struct cubic {
 	float a,b,c,d;
 } Cubic;
 
+#if USE_MULTITHREADING
+
 typedef struct thread_arg_bicubic {
     Cubic *cubics;
     float *big;
     int s;
     int res;
     int offset;
-    int start;
 } ThreadArgBicubic;
 
 typedef struct thread_arg_composite {
@@ -64,8 +71,43 @@ typedef struct thread_arg_composite {
     int stride;
     int layerCount;
     int layerSize;
-    int start;
 } ThreadArgComposite;
+
+enum thread_task {
+    BICUBIC,
+    COMPOSITE,
+};
+
+typedef struct thread_arg_generic {
+    enum thread_task task;
+    union {
+        ThreadArgBicubic bicubic;
+        ThreadArgComposite composite;
+    } thread_arg;
+} ThreadArg;
+
+static atomic_char32_t render_row;
+static sem_t rendering_semaphore, start_semaphore, stop_semaphore;
+static ThreadArg thread_arg;
+
+static void launch_render()
+{
+    sem_wait(&rendering_semaphore); // wait for any other rendering processes to finish
+    
+    atomic_init(&render_row, 0);
+    
+    for(int i = 0; i < THREADS; ++i) {
+        sem_post(&start_semaphore); // send a start rendering message to each thread
+    }
+    
+    for(int i = 0; i < THREADS; ++i) {
+        sem_wait(&stop_semaphore); // wait for all threads to finish rendering
+    }
+    
+    sem_post(&rendering_semaphore); // mark that rendering is finished
+}
+
+#endif
 
 static Cubic cub_interp(float m, float n, float o, float p)
 { // https://dsp.stackexchange.com/questions/18265/bicubic-interpolation - BUT I COULD DO THE MATHS MYSELF IF I WANTED TO
@@ -187,14 +229,18 @@ static void bicubic_row(Cubic *cubics, int s, float *big, int res, int offset, i
     }
 }
 
-static void* maintain_thread_bicubic_row(void *data)
+#if USE_MULTITHREADING
+
+static void maintain_thread_bicubic_row()
 {
-    ThreadArgBicubic *ta = (ThreadArgBicubic*)data;
-    for(int y = ta->start; y < ta->res; y += THREADS){
-        bicubic_row(ta->cubics, ta->s, ta->big, ta->res, ta->offset, y);
+    ThreadArgBicubic ta = thread_arg.thread_arg.bicubic;
+    int row;
+    while((row = atomic_fetch_add_explicit(&render_row, 1, memory_order_relaxed)) < ta.res){
+        bicubic_row(ta.cubics, ta.s, ta.big, ta.res, ta.offset, row);
     }
-    return NULL;
 }
+
+#endif
 
 int bicubic(float *small, int s, float *big, int res, int offset)
 {
@@ -215,22 +261,16 @@ int bicubic(float *small, int s, float *big, int res, int offset)
         }
     }
 #if USE_MULTITHREADING
-    pthread_t threads[THREADS];
-    ThreadArgBicubic thread_args[THREADS];
-    for(int t = 0; t < THREADS; ++t){
-        thread_args[t] = /*(ThreadArgBicubic)*/{
-            cubics,
-            big,
-            s,
-            res,
-            offset,
-            t
-        };
-        pthread_create(threads + t, NULL, maintain_thread_bicubic_row, thread_args + t);
-    }
-    for(int t = 0; t < THREADS; ++t){
-        pthread_join(threads[t], NULL);
-    }
+    thread_arg.task = BICUBIC;
+    thread_arg.thread_arg.bicubic = /*(ThreadArgBicubic)*/{
+        cubics,
+        big,
+        s,
+        res,
+        offset
+    };
+
+    launch_render();
 #else
     for(int y = 0; y < res; ++y){
         bicubic_row(cubics, s, big, res, offset, y);
@@ -320,38 +360,72 @@ static void composite_row(Tracker *tracker, MapLayerColourMapping *mappings, int
     }
 }
 
-static void *maintain_thread_composite_row(void *data)
+#if USE_MULTITHREADING
+
+static void maintain_thread_composite_row()
 {
-    ThreadArgComposite *ta = (ThreadArgComposite*)data;
-    for(int y = ta->start; y < ta->res; y += THREADS){
-        composite_row(ta->tracker, ta->mappings, ta->res, ta->stride, ta->layerCount, ta->layerSize, y);
+    ThreadArgComposite ta = thread_arg.thread_arg.composite;
+    int row;
+    while((row = atomic_fetch_add_explicit(&render_row, 1, memory_order_relaxed)) < ta.res){
+        composite_row(ta.tracker, ta.mappings, ta.res, ta.stride, ta.layerCount, ta.layerSize, row);
     }
-    return NULL;
 }
+
+#endif
 
 void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int stride, int layerCount, int layerSize)
 {
 #if USE_MULTITHREADING
-    pthread_t threads[THREADS];
-    ThreadArgComposite thread_args[THREADS];
-    for(int t = 0; t < THREADS; ++t){
-        thread_args[t] = /*(ThreadArgComposite)*/{
-            tracker,
-            mappings,
-            res,
-            stride,
-            layerCount,
-            layerSize,
-            t
-        };
-        pthread_create(threads + t, NULL, maintain_thread_composite_row, thread_args + t);
-    }
-    for(int t = 0; t < THREADS; ++t){
-        pthread_join(threads[t], NULL);
-    }
+    thread_arg.task = COMPOSITE;
+    thread_arg.thread_arg.composite = /*(ThreadArgComposite)*/{
+        tracker,
+        mappings,
+        res,
+        stride,
+        layerCount,
+        layerSize
+    };
+    
+    launch_render();
 #else
     for(int y = 0; y < res; ++y){
         composite_row(tracker, mappings, res, stride, layerCount, layerSize, y);
+    }
+#endif
+}
+
+#if USE_MULTITHREADING
+
+__attribute__((noreturn)) static void* maintain_thread_generic(__attribute__((unused)) void *data)
+{
+    while(1){
+        sem_wait(&start_semaphore); // wait to be told to start
+        switch(thread_arg.task) {
+            case BICUBIC:
+                maintain_thread_bicubic_row();
+                break;
+            case COMPOSITE:
+                maintain_thread_composite_row();
+                break;
+            default:
+                csa_error("invalid value of 'thread_arg.task'. (Expected one of BICUBIC, COMPOSITE)\n");
+        }
+        sem_post(&stop_semaphore); // inform the main thread that rendering is done
+    }
+}
+
+#endif
+
+void init_accelerate()
+{
+#if USE_MULTITHREADING
+    sem_init(&rendering_semaphore, 0, 1);
+    sem_init(&start_semaphore, 0, 0);
+    sem_init(&stop_semaphore, 0, 0);
+    
+    pthread_t threads[THREADS];
+    for(int t = 0; t < THREADS; ++t){
+        pthread_create(threads + t, NULL, maintain_thread_generic, NULL);
     }
 #endif
 }

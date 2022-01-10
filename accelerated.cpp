@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <stdatomic.h>
 #include <semaphore.h>
 
@@ -242,7 +243,7 @@ static void maintain_thread_bicubic_row()
 
 #endif
 
-int bicubic(float *small, int s, float *big, int res, int offset)
+int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset)
 {
     offset = offset ? 1 : 0;
     const int size = s + 2 * offset - 1;

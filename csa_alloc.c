@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "csa_alloc.h"
+#include "csa_error.h"
 
 #ifndef DEBUG
 #define DEBUG 1 // when TRUE a leak report is printed at exit
@@ -83,7 +84,7 @@ static void log_alloc(void *ptr, const char *msg, size_t size)
 				allocs[i] = (AllocInfo){ptr, msg, size, 0};
 				found = 1;
 			}else{
-				fprintf(stderr, "ERROR: POINTER %p ALLOCATED REPEATEDLY WITHOUT FREE! (%9lu bytes @ %s)\n", ptr, size, msg);
+				csa_error("POINTER %p ALLOCATED REPEATEDLY WITHOUT FREE! (%9lu bytes @ %s)\n", ptr, size, msg);
 			}
 		}
 	}
@@ -94,7 +95,7 @@ static void log_alloc(void *ptr, const char *msg, size_t size)
 	++n_allocs;
 	allocs = realloc(allocs, n_allocs * sizeof(AllocInfo));
 	if(allocs == NULL){
-		fprintf(stderr, "ABORTING: failed to (re)allocate memory to record the allocation of memory for debugging purposes.\n");
+		csa_error("ABORTING: failed to (re)allocate memory to record the allocation of memory for debugging purposes.\n");
 		exit(-1);
 	}
 	allocs[n_allocs - 1] = (AllocInfo){ptr, msg, size, 0};
@@ -142,7 +143,7 @@ void csa_free(void *ptr)
 	for(int i = 0; i < n_allocs; ++i){
 		if(allocs[i].ptr == ptr){
 			if(found){
-				fprintf(stderr, "ERROR: POINTER %p OCCURS MORE THAN ONCE IN ARRAY 'allocs'! (this occurrence: %lu bytes @ %s)\n", ptr, allocs[i].size, allocs[i].msg);
+				csa_error("POINTER %p OCCURS MORE THAN ONCE IN ARRAY 'allocs'! (this occurrence: %lu bytes @ %s)\n", ptr, allocs[i].size, allocs[i].msg);
 #if DUMP_ON_DUPLICATE
 				for(int j = 0; j < n_allocs; ++j){
 					fprintf(stderr, "%s%p\t %i %9lu %s\033[0m\n", allocs[j].ptr == ptr ? "\033[1;31m" : "", allocs[j].ptr, allocs[j].freed, allocs[j].size, allocs[j].msg);
@@ -151,7 +152,7 @@ void csa_free(void *ptr)
 #endif
 			}
 			if(allocs[i].freed){
-				fprintf(stderr, "ERROR: POINTER %p (%lu bytes @ %s) IS BEING FREED A SECOND TIME!\n", ptr, allocs[i].size, allocs[i].msg);
+				csa_error("POINTER %p (%lu bytes @ %s) IS BEING FREED A SECOND TIME!\n", ptr, allocs[i].size, allocs[i].msg);
 			}else{
 				allocs[i].freed = 1;
 #if RECORD_ALLOC_COUNT_AND_SIZE
@@ -164,7 +165,7 @@ void csa_free(void *ptr)
 		}
 	}
 	if(!found){
-		fprintf(stderr, "ERROR: POINTER %p WAS NOT FOUND IN 'allocs' ARRAY!\n", ptr);
+		csa_error("POINTER %p WAS NOT FOUND IN 'allocs' ARRAY!\n", ptr);
 	}
 #endif
 	free(ptr);

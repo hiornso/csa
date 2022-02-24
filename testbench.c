@@ -11,9 +11,19 @@
 #define OUTPUT_PNG 0
 #endif
 
-#define ITERS  50
+#define ITERS  1
 #define WIDTH  1000
 #define HEIGHT 1000
+
+#ifndef USE_DEBUG_MAP
+#define USE_DEBUG_MAP 0
+#endif
+
+#if USE_DEBUG_MAP
+#define TESTBENCH_MAP "maps/debugmap.lua"
+#else
+#define TESTBENCH_MAP "maps/testbench.lua"
+#endif
 
 void error_popup(__attribute__ ((unused)) Omni *data, __attribute__ ((unused)) char *fmt, ...) {}
 void free_linked_changes(__attribute__ ((unused)) ChangeListNode *cln) {}
@@ -33,7 +43,7 @@ int main()
 	data.gui_elems.captain_drawing_area = dummy; // make it do course plotter, we don't care about the rendering of the dots, just the map
 	data.course_plotter.position_history = NULL; // register no positions whatsoever - effectively we are rendering the map before they have chosen a starting position
 	
-	if(init_tracker(&data, "maps/testbench.lua", FROM_FILE, TRUE)){ // make a "captain tracker"
+	if(init_tracker(&data, TESTBENCH_MAP, FROM_FILE, TRUE)){ // make a "captain tracker"
 		csa_error("an error occurred in init_tracker.\n");
 		return -1;
 	}

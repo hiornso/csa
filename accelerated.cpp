@@ -4,6 +4,12 @@
 #include <stdatomic.h>
 #include <semaphore.h>
 
+#define HAVE_INLINE 1 // use inlines for GSL where possible
+
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_blas.h>
+
 extern "C" {
 
 #include "main.h"
@@ -51,14 +57,14 @@ typedef Vec4i Veci;
 
 #endif // USE_VECTORS
 
-typedef struct cubic {
-	float a,b,c,d;
-} Cubic;
+typedef struct bicubic_matrix {
+    float mat[4*4];
+} BicubicMatrix;
 
 #if USE_MULTITHREADING
 
 typedef struct thread_arg_bicubic {
-    Cubic *cubics;
+    BicubicMatrix *matrices;
     float *big;
     int s;
     int res;
@@ -110,51 +116,18 @@ static void launch_render()
 
 #endif
 
-static Cubic cub_interp(float m, float n, float o, float p)
-{ // https://dsp.stackexchange.com/questions/18265/bicubic-interpolation - BUT I COULD DO THE MATHS MYSELF IF I WANTED TO
-	float a = 0.5f * (-m + 3.f * (n - o) + p);
-	float b = m + 2.f * o - 0.5f * (5.f * n + p);
-	float c = 0.5f * (o - m);
-	float d = n;
-	return /*(Cubic)*/{a,b,c,d};
-}
-
-static float cub_at_x(Cubic c, float x)
-{
-	float sq = x * x;
-	float cu = sq * x;
-	return c.a * cu + c.b * sq + c.c * x + c.d;
-}
-
-#if USE_VECTORS
-static Vecf vec_cub_at_x(Vecf a, Vecf b, Vecf c, Vecf d, Vecf x)
-{
-    Vecf sq = x * x;
-    Vecf cu = sq * x;
-    return a * cu + b * sq + c * x + d;
-}
-
-static Vecf vec_cub_interp_at_x(Vecf m, Vecf n, Vecf o, Vecf p, Vecf x)
-{
-    Vecf a = 0.5f * (-m + 3.f * (n - o) + p);
-	Vecf b = m + 2.f * o - 0.5f * (5.f * n + p);
-	Vecf c = 0.5f * (o - m);
-	Vecf d = n;
-    
-    return vec_cub_at_x(a,b,c,d, x);
-}
-
-#define INTERPOLATE_Y(DEST, IND) \
-    ind_base = (IND) * sizeof(Cubic) / sizeof(float); /* index of cubic in cubics array * 4 floats per cubic */ \
-    a = lookup<INT_MAX>(ind_base + offsetof(Cubic, a) / sizeof(float), (float const *)cubics); \
-    b = lookup<INT_MAX>(ind_base + offsetof(Cubic, b) / sizeof(float), (float const *)cubics); \
-    c = lookup<INT_MAX>(ind_base + offsetof(Cubic, c) / sizeof(float), (float const *)cubics); \
-    d = lookup<INT_MAX>(ind_base + offsetof(Cubic, d) / sizeof(float), (float const *)cubics); \
-    Vecf DEST = vec_cub_at_x(a,b,c,d, xx);
-
+#if OPENBLAS
+extern "C" void openblas_set_num_threads(int threads);
 #endif
 
-static void bicubic_row(Cubic *cubics, int s, float *big, int res, int offset, int y)
+static const float constmat[] = {
+     1, 0, 0, 0,
+     0, 0, 1, 0,
+    -3, 3,-2,-1,
+     2,-2, 1, 1,
+};
+
+static void bicubic_row(BicubicMatrix *matrices, int s, float *big, int res, int offset, int y)
 {
     const int size = s + 2 * offset - 1;
     int row;
@@ -167,47 +140,15 @@ static void bicubic_row(Cubic *cubics, int s, float *big, int res, int offset, i
         yy = ((s - 1) * y - row * res) / (float)res;
     }
     
-    int done_with_vectors = 0;
-#if USE_VECTORS
-    int iters = res / VECSIZE;
-    done_with_vectors = iters * VECSIZE;
+    const float ycolvec[4] = {1.0f, yy, yy*yy, yy*yy*yy};
+    float tmp[4];
     
-    Veci x = ASCENDING_VECTOR;
-    for(int i = 0; i < iters; ++i){
-        Veci col;
-        Vecf xx;
-        if(offset){
-            col = ((x + res/(2 * s)) * s) / res;
-            xx = to_float(( x - col * res / s + res/(2 * s) ) * s ) / (float)res;
-        }else{
-            col = (x * (s - 1)) / res;
-            xx = to_float((s - 1) * x - col * res) / (float)res;
-        }
-        
-        Vecf a,b,c,d;
-        Veci ind_base;
-        
-        INTERPOLATE_Y(y_1,  CLAMP(row - offset - 1, 0, s - 1) * size + col);
-        INTERPOLATE_Y(y0 ,  CLAMP(row - offset    , 0, s - 1) * size + col);
-        INTERPOLATE_Y(y1 ,  CLAMP(row - offset + 1, 0, s - 1) * size + col);
-        INTERPOLATE_Y(y2 ,  CLAMP(row - offset + 2, 0, s - 1) * size + col);
-        
-#if USE_LOADSTORE
-        float *dest = big + y * res + i * VECSIZE;
-        Vecf result;
-        result.load(dest);
-        result += vec_cub_interp_at_x(y_1, y0, y1, y2, yy);
-        result.store(dest);
-#else
-        Vecf result = vec_cub_interp_at_x(y_1, y0, y1, y2, yy);
-        for(int j = 0; j < VECSIZE; ++j){
-            big[y * res + i * VECSIZE + j] += result[j];
-        }
-#endif
-        x += VECSIZE;
-    }
-#endif
-    for(int x = done_with_vectors; x < res; ++x){ // only need to do what has not been done already
+    gsl_vector_float_const_view y_view = gsl_vector_float_const_view_array(ycolvec, 4);
+    gsl_vector_float_view tmp_view = gsl_vector_float_view_array(tmp, 4);
+    
+    int lastcol = INT_MAX;
+    
+    for(int x = 0; x < res; ++x){
         
         int col;
         float xx;
@@ -218,15 +159,19 @@ static void bicubic_row(Cubic *cubics, int s, float *big, int res, int offset, i
             col = (x * (s - 1)) / res;
             xx = ((s - 1) * x - col * res) / (float)res;
         }
+    
+        if(lastcol != col) {
+            gsl_matrix_float_const_view bicubic = gsl_matrix_float_const_view_array(matrices[row * size + col].mat, 4, 4);
+
+            gsl_blas_sgemv(CblasNoTrans, 1.0f, &bicubic.matrix, &y_view.vector, 0.0f, &tmp_view.vector);
+        }
         
-        float y_1 = cub_at_x(cubics[CLAMP(row - offset - 1, 0, s - 1) * size + col], xx);
-        float y0  = cub_at_x(cubics[CLAMP(row - offset    , 0, s - 1) * size + col], xx);
-        float y1  = cub_at_x(cubics[CLAMP(row - offset + 1, 0, s - 1) * size + col], xx);
-        float y2  = cub_at_x(cubics[CLAMP(row - offset + 2, 0, s - 1) * size + col], xx);
+        const float xrowvec[4] = {1.0f, xx, xx*xx, xx*xx*xx};
         
-        Cubic c = cub_interp(y_1, y0, y1, y2);
+        gsl_matrix_float_const_view x_view = gsl_matrix_float_const_view_array(xrowvec, 1, 4);
+        gsl_vector_float_view dest = gsl_vector_float_view_array(&big[y * res + x], 1);
         
-        big[y * res + x] += cub_at_x(c, yy);
+        gsl_blas_sgemv(CblasNoTrans, 1.0f, &x_view.matrix, &tmp_view.vector, 1.0f, &dest.vector);
     }
 }
 
@@ -237,7 +182,7 @@ static void maintain_thread_bicubic_row()
     ThreadArgBicubic ta = thread_arg.thread_arg.bicubic;
     int row;
     while((row = atomic_fetch_add_explicit(&render_row, 1, memory_order_relaxed)) < ta.res){
-        bicubic_row(ta.cubics, ta.s, ta.big, ta.res, ta.offset, row);
+        bicubic_row(ta.matrices, ta.s, ta.big, ta.res, ta.offset, row);
     }
 }
 
@@ -247,24 +192,49 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
 {
     offset = offset ? 1 : 0;
     const int size = s + 2 * offset - 1;
-    Cubic *cubics = (Cubic*)csa_malloc(sizeof(Cubic) * size * s); // could cache this, but probably not worth it - not a hot loop, and would increase memory usage a bit, so why bother
-    if(cubics == NULL){
+    BicubicMatrix *matrices = (BicubicMatrix*)csa_calloc(size * size, sizeof(BicubicMatrix)); // could cache this, but probably not worth it - not a hot loop, and would increase memory usage a bit, so why bother
+    if(matrices == NULL){
         return -1;
     }
-    for(int row = 0; row < s; ++row){
+    
+    gsl_matrix_float_const_view constmat_view = gsl_matrix_float_const_view_array(constmat, 4, 4);
+    for(int row = 1 - offset; row < s + offset; ++row){
         for(int col = 1 - offset; col < s + offset; ++col){
-            cubics[row * size + col + offset - 1] = cub_interp(
-                small[row * s + CLAMP(col - 2, 0, s - 1)],
-                small[row * s + CLAMP(col - 1, 0, s - 1)],
-                small[row * s + CLAMP(col    , 0, s - 1)],
-                small[row * s + CLAMP(col + 1, 0, s - 1)]
-            );
+            
+#define F(Y,X) (small[CLAMP((Y) - 1, 0, s - 1) * s + CLAMP((X) - 1, 0, s - 1)])
+#define Fx(Y,X) ((F((Y), (X) + 1) - F((Y), (X) - 1))/2.0f)
+#define Fy(Y,X) ((F((Y) + 1, (X)) - F((Y) - 1, (X)))/2.0f)
+#define Fxy(Y,X) ((Fy((Y), (X) + 1) - Fy((Y), (X) - 1))/2.0f)
+            
+            float tmp_[4*4];
+            const float values_[] = { // transposed here so we can transpose again later (sgemm faster when second mat. is transposed)
+                F (row    , col    ), F (row    , col + 1), Fx (row    , col    ), Fx (row    , col + 1),
+                F (row + 1, col    ), F (row + 1, col + 1), Fx (row + 1, col    ), Fx (row + 1, col + 1),
+                Fy(row    , col    ), Fy(row    , col + 1), Fxy(row    , col    ), Fxy(row    , col + 1),
+                Fy(row + 1, col    ), Fy(row + 1, col + 1), Fxy(row + 1, col    ), Fxy(row + 1, col + 1),
+            };
+            
+            gsl_matrix_float_view tmp = gsl_matrix_float_view_array(tmp_, 4, 4);
+            gsl_matrix_float_const_view values = gsl_matrix_float_const_view_array(values_, 4, 4);
+            gsl_matrix_float_view dest = gsl_matrix_float_view_array(matrices[(row + offset - 1) * size + (col + offset - 1)].mat, 4, 4);
+            
+            gsl_blas_sgemm(
+                CblasNoTrans, CblasTrans,
+                1.0f, &constmat_view.matrix, &values.matrix,
+                0.0f, &tmp.matrix
+            ); // tmp = 1.0 * constmat * values + 0.0 * tmp
+            
+            gsl_blas_sgemm(
+                CblasNoTrans, CblasTrans,
+                1.0f, &tmp.matrix, &constmat_view.matrix,
+                0.0f, &dest.matrix
+            ); // dest = 1.0 * tmp * constmat^T + 0.0 * dest;
         }
     }
 #if USE_MULTITHREADING
     thread_arg.task = BICUBIC;
     thread_arg.thread_arg.bicubic = /*(ThreadArgBicubic)*/{
-        cubics,
+        matrices,
         big,
         s,
         res,
@@ -274,10 +244,11 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
     launch_render();
 #else
     for(int y = 0; y < res; ++y){
-        bicubic_row(cubics, s, big, res, offset, y);
+        bicubic_row(matrices, s, big, res, offset, y);
     }
 #endif
-    csa_free(cubics);
+
+    csa_free(matrices);
 	
 	return 0;
 }
@@ -419,6 +390,10 @@ __attribute__((noreturn)) static void* maintain_thread_generic(__attribute__((un
 
 void init_accelerate()
 {
+#if OPENBLAS
+    openblas_set_num_threads(1);
+#endif
+
 #if USE_MULTITHREADING
     sem_init(&rendering_semaphore, 0, 1);
     sem_init(&start_semaphore, 0, 0);

@@ -5,6 +5,7 @@ PKGCONFIG ?= pkg-config
 
 USE_VCL ?= 0
 USE_LTO ?= 0
+OPENBLAS ?= 1
 
 CFLAGS += -MMD -MP
 
@@ -25,7 +26,15 @@ CFLAGS   += -Wall -Wextra -Wpedantic -Wno-overlength-strings
 CXXFLAGS += $(CFLAGS) -std=$(CXXSTD)
 
 LDLIBS += `$(PKGCONFIG) --libs gtk4 luajit`
-LDLIBS += -lpthread -lm
+LDLIBS += -lpthread -lm -lgsl
+
+ifeq ($(OPENBLAS),1)
+CXXFLAGS += -DOPENBLAS=1
+LDLIBS += -lopenblas
+else
+CXXFLAGS += -DOPENBLAS=0
+LDLIBS += -lcblas
+endif
 
 BUILD_DIR ?= build
 

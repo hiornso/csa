@@ -33,6 +33,7 @@ void update_window_title(__attribute__ ((unused)) Omni *data) {}
 
 int main()
 {
+	csa_init_alloc_tracker();
 	init_accelerate();
 	
 	gtk_init();

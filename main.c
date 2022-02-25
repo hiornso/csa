@@ -1378,6 +1378,7 @@ static int handle_local_cmdline_args(__attribute__ ((unused)) GApplication *appl
 
 int main(int argc, char *argv[])
 {
+	csa_init_alloc_tracker();
 	init_accelerate();
 	
 	GtkApplication *app = gtk_application_new(CSA_APPLICATION_ID, G_APPLICATION_HANDLES_COMMAND_LINE);

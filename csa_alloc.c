@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <semaphore.h>
 
 #include "csa_alloc.h"
 #include "csa_error.h"
@@ -28,16 +29,24 @@ typedef struct alloc_info_struct {
 	char freed;
 } AllocInfo;
 
-static AllocInfo *allocs = NULL;
-static int n_allocs = 0;
+static volatile AllocInfo *allocs = NULL;
+static volatile int n_allocs = 0;
 
 #if RECORD_ALLOC_COUNT_AND_SIZE
-static int alloc_count = 0;
-static long long int alloc_total_size = 0;
-static int free_count = 0;
-static long long int free_total_size = 0;
+static volatile int alloc_count = 0;
+static volatile long long int alloc_total_size = 0;
+static volatile int free_count = 0;
+static volatile long long int free_total_size = 0;
 #endif
+
+static sem_t threadlock;
 #endif
+
+void csa_init_alloc_tracker(void) {
+#if DEBUG
+	sem_init(&threadlock, 0, 1);
+#endif
+}
 
 void csa_alloc_print_report(void)
 {
@@ -72,6 +81,8 @@ void csa_alloc_print_report(void)
 #if DEBUG
 static void log_alloc(void *ptr, const char *msg, size_t size)
 {
+	sem_wait(&threadlock);
+	
 #if RECORD_ALLOC_COUNT_AND_SIZE
 	++alloc_count;
 	alloc_total_size += size;
@@ -89,16 +100,19 @@ static void log_alloc(void *ptr, const char *msg, size_t size)
 		}
 	}
 	if(found){
+		sem_post(&threadlock);
 		return;
 	}
 	
 	++n_allocs;
-	allocs = realloc(allocs, n_allocs * sizeof(AllocInfo));
+	allocs = realloc((void*)allocs, n_allocs * sizeof(AllocInfo));
 	if(allocs == NULL){
 		csa_error("ABORTING: failed to (re)allocate memory to record the allocation of memory for debugging purposes.\n");
 		exit(-1);
 	}
 	allocs[n_allocs - 1] = (AllocInfo){ptr, msg, size, 0};
+	
+	sem_post(&threadlock);
 }
 #endif
 
@@ -135,6 +149,8 @@ void csa_free(void *ptr)
 #if DEBUG
 	if(ptr == NULL) return;
 	
+	sem_wait(&threadlock);
+	
 #if RECORD_ALLOC_COUNT_AND_SIZE
 	++free_count;
 #endif
@@ -167,6 +183,8 @@ void csa_free(void *ptr)
 	if(!found){
 		csa_error("POINTER %p WAS NOT FOUND IN 'allocs' ARRAY!\n", ptr);
 	}
+	
+	sem_post(&threadlock);
 #endif
 	free(ptr);
 }

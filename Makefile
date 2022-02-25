@@ -6,6 +6,7 @@ PKGCONFIG ?= pkg-config
 USE_VCL ?= 0
 USE_LTO ?= 0
 OPENBLAS ?= 1
+DEBUGINFO ?= 1
 
 CFLAGS += -MMD -MP
 
@@ -15,13 +16,17 @@ OPT_LEVEL ?= 3
 CFLAGS    += -O$(OPT_LEVEL)
 LDFLAGS   += -O$(OPT_LEVEL)
 
+ifeq ($(DEBUGINFO),1)
+CFLAGS += -g
+endif
+
 ifeq ($(USE_LTO),1)
 CFLAGS  += -flto
 LDFLAGS += -flto
 endif
 
 CFLAGS   += `$(PKGCONFIG) --cflags gtk4 luajit`
-CFLAGS   += -mavx2 -mfma
+CFLAGS   += -march=native
 CFLAGS   += -Wall -Wextra -Wpedantic -Wno-overlength-strings
 CXXFLAGS += $(CFLAGS) -std=$(CXXSTD)
 

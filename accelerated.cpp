@@ -102,9 +102,12 @@ static atomic_char32_t render_square;
 static sem_t rendering_semaphore, start_semaphore, stop_semaphore;
 static ThreadArg thread_arg;
 
-static void launch_render()
+static void launch_render(ThreadArg ta)
 {
     sem_wait(&rendering_semaphore); // wait for any other rendering processes to finish
+    
+    thread_arg = ta;
+    atomic_thread_fence(memory_order_release);
     
     atomic_init(&render_square, 0);
     
@@ -283,8 +286,9 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
         }
     }
     
-    thread_arg.task = BICUBIC;
-    thread_arg.thread_arg.bicubic = /*(ThreadArgBicubic)*/{
+    ThreadArg ta;
+    ta.task = BICUBIC;
+    ta.thread_arg.bicubic = /*(ThreadArgBicubic)*/{
         storage,
         matrices,
         big,
@@ -292,8 +296,8 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
         res,
         offset
     };
-
-    launch_render();
+    
+    launch_render(ta);
     
     for(int i = 0; i < 3*THREADS; ++i) {
         csa_free(storage[i]);
@@ -419,8 +423,9 @@ static void maintain_thread_composite_row(__attribute__((unused)) int thread_ind
 void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int stride, int layerCount, int layerSize)
 {
 #if USE_MULTITHREADING
-    thread_arg.task = COMPOSITE;
-    thread_arg.thread_arg.composite = /*(ThreadArgComposite)*/{
+    ThreadArg ta;
+    ta.task = COMPOSITE;
+    ta.thread_arg.composite = /*(ThreadArgComposite)*/{
         tracker,
         mappings,
         res,
@@ -429,7 +434,7 @@ void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int s
         layerSize
     };
     
-    launch_render();
+    launch_render(ta);
 #else
     for(int y = 0; y < res; ++y){
         composite_row(tracker, mappings, res, stride, layerCount, layerSize, y);
@@ -443,6 +448,8 @@ __attribute__((noreturn)) static void* maintain_thread_generic(void *data)
 {
     while(1){
         sem_wait(&start_semaphore); // wait to be told to start
+        atomic_thread_fence(memory_order_acquire); // get updates to thread_arg
+        
         switch(thread_arg.task) {
             case BICUBIC:
                 maintain_thread_bicubic_row((int)(intptr_t)data);

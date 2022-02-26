@@ -275,6 +275,12 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
     float *storage[3*THREADS];
     for (int i = 0; i < 3*THREADS; ++i) {
         storage[i] = (float*)csa_malloc(sizeof(float) * 4 * max_res);
+        if (storage[i] == NULL) {
+            for (int j = 0; j < i; ++j) {
+                csa_free(storage[j]);
+            }
+            return -1;
+        }
     }
     
     thread_arg.task = BICUBIC;
@@ -296,6 +302,12 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
     float *storage[3];
     for (int i = 0; i < 3; ++i) {
         storage[i] = (float*)csa_malloc(sizeof(float) * 4 * max_res);
+        if (storage[i] == NULL) {
+            for (int j = 0; j < i; ++j) {
+                csa_free(storage[j]);
+            }
+            return -1;
+        }
     }
     
     for(int square = 0; square < size * size; ++square){

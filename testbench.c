@@ -11,7 +11,7 @@
 #define OUTPUT_PNG 0
 #endif
 
-#define ITERS  1
+#define ITERS  100
 #define WIDTH  1000
 #define HEIGHT 1000
 

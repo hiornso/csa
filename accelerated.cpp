@@ -3,6 +3,8 @@
 #include <inttypes.h>
 #include <stdatomic.h>
 #include <semaphore.h>
+#include <math.h>
+#include <unistd.h>
 
 #define HAVE_INLINE 1 // use inlines for GSL where possible
 
@@ -18,6 +20,8 @@ extern "C" {
 #include "csa_error.h"
 
 }
+
+#define SQUARE(x) ((x)*(x))
 
 #define USE_MULTITHREADING 1
 #ifndef USE_VECTORS
@@ -64,6 +68,7 @@ typedef struct bicubic_matrix {
 #if USE_MULTITHREADING
 
 typedef struct thread_arg_bicubic {
+    float **storage;
     BicubicMatrix *matrices;
     float *big;
     int s;
@@ -93,7 +98,7 @@ typedef struct thread_arg_generic {
     } thread_arg;
 } ThreadArg;
 
-static atomic_char32_t render_row;
+static atomic_char32_t render_square;
 static sem_t rendering_semaphore, start_semaphore, stop_semaphore;
 static ThreadArg thread_arg;
 
@@ -101,7 +106,7 @@ static void launch_render()
 {
     sem_wait(&rendering_semaphore); // wait for any other rendering processes to finish
     
-    atomic_init(&render_row, 0);
+    atomic_init(&render_square, 0);
     
     for(int i = 0; i < THREADS; ++i) {
         sem_post(&start_semaphore); // send a start rendering message to each thread
@@ -127,62 +132,94 @@ static const float constmat[] = {
      2,-2, 1, 1,
 };
 
-static void bicubic_row(BicubicMatrix *matrices, int s, float *big, int res, int offset, int y)
+static void bicubic_square(float **storage, const BicubicMatrix *matrices, const int s, float *big, const int res, const int offset, const int square)
 {
     const int size = s + 2 * offset - 1;
-    int row;
-    float yy;
-    if(offset){
-        row = ((y + res/(2 * s)) * s) / res;
-        yy = (( y - row * res / s + res/(2 * s) ) * s ) / (float)res;
-    }else{
-        row = (y * (s - 1)) / res;
-        yy = ((s - 1) * y - row * res) / (float)res;
+    const int row = square / size;
+    const int col = square % size;
+    
+    const BicubicMatrix *mat = &matrices[square];
+    
+    int square_start_x;
+    int square_end_x;
+    int square_start_y;
+    int square_end_y;
+    
+    if (offset) {
+        square_start_x = (int)((col - 1) * (float)res / s + 0.5f * (float)res / s);
+        if (square_start_x < 0) square_start_x = 0;
+        square_end_x = (int)(col * (float)res / s + 0.5f * (float)res / s);
+        if (square_end_x >= res) square_end_x = res - 1;
+        square_start_y = (int)((row - 1) * (float)res / s + 0.5f * (float)res / s);
+        if (square_start_y < 0) square_start_y = 0;
+        square_end_y = (int)(row * (float)res / s + 0.5f * (float)res / s);
+        if (square_end_y >= res) square_end_y = res - 1;
+    } else {
+        square_start_x = (int)(col * (float)res / (s - 1));
+        square_end_x = (int)((col + 1) * (float)res / (s - 1));
+        square_start_y = (int)(row * (float)res / (s - 1));
+        square_end_y = (int)((row + 1) * (float)res / (s - 1));
     }
     
-    const float ycolvec[4] = {1.0f, yy, yy*yy, yy*yy*yy};
-    float tmp[4];
+    const int res_x = square_end_x - square_start_x;
+    const int res_y = square_end_y - square_start_y;
     
-    gsl_vector_float_const_view y_view = gsl_vector_float_const_view_array(ycolvec, 4);
-    gsl_vector_float_view tmp_view = gsl_vector_float_view_array(tmp, 4);
+    float *ymat = storage[0];
+    float *tmp  = storage[1];
+    float *xmat = storage[2];
     
-    int lastcol = INT_MAX;
-    
-    for(int x = 0; x < res; ++x){
-        
-        int col;
-        float xx;
-        if(offset){
-            col = ((x + res/(2 * s)) * s) / res;
-            xx = (( x - col * res / s + res/(2 * s) ) * s ) / (float)res;
-        }else{
-            col = (x * (s - 1)) / res;
-            xx = ((s - 1) * x - col * res) / (float)res;
+    for(int j = 0; j < 4; ++j) {
+        for(int i = 0; i < res_y; ++i) {
+            float f = 1.0f;
+            float yy;
+            int y = square_start_y + i;
+            if(offset){
+                yy = (( y - row * res / s + res/(2 * s) ) * s ) / (float)res;
+            }else{
+                yy = ((s - 1) * y - row * res) / (float)res;
+            }
+            for(int k = 0; k < j; ++k) {
+                f *= yy;
+            }
+            ymat[j * res_y + i] = f;
         }
-    
-        if(lastcol != col) {
-            gsl_matrix_float_const_view bicubic = gsl_matrix_float_const_view_array(matrices[row * size + col].mat, 4, 4);
-
-            gsl_blas_sgemv(CblasNoTrans, 1.0f, &bicubic.matrix, &y_view.vector, 0.0f, &tmp_view.vector);
-        }
-        
-        const float xrowvec[4] = {1.0f, xx, xx*xx, xx*xx*xx};
-        
-        gsl_matrix_float_const_view x_view = gsl_matrix_float_const_view_array(xrowvec, 1, 4);
-        gsl_vector_float_view dest = gsl_vector_float_view_array(&big[y * res + x], 1);
-        
-        gsl_blas_sgemv(CblasNoTrans, 1.0f, &x_view.matrix, &tmp_view.vector, 1.0f, &dest.vector);
     }
+    
+    for(int i = 0; i < res_x; ++i) {
+        for(int j = 0; j < 4; ++j) {
+            float f = 1.0f;
+            float xx;
+            int x = square_start_x + i;
+            if(offset){
+                xx = (( x - col * res / s + res/(2 * s) ) * s ) / (float)res;
+            }else{
+                xx = ((s - 1) * x - col * res) / (float)res;
+            }
+            for(int k = 0; k < j; ++k) {
+                f *= xx;
+            }
+            xmat[i * 4 + j] = f;
+        }
+    }
+    
+    gsl_matrix_float_const_view x_view = gsl_matrix_float_const_view_array(xmat, res_x, 4);
+    gsl_matrix_float_const_view y_view = gsl_matrix_float_const_view_array(ymat, 4, res_y);
+    gsl_matrix_float_view tmp_view = gsl_matrix_float_view_array(tmp, 4, res_y);
+    gsl_matrix_float_const_view bicubic = gsl_matrix_float_const_view_array(mat->mat, 4, 4);
+    gsl_matrix_float_view dest = gsl_matrix_float_view_array_with_tda(&big[square_start_y * res + square_start_x], res_y, res_x, res);
+    
+    gsl_blas_sgemm(CblasNoTrans, CblasNoTrans, 1.0f, &bicubic.matrix, &y_view.matrix, 0.0f, &tmp_view.matrix);
+    gsl_blas_sgemm(CblasTrans, CblasTrans, 1.0f, &tmp_view.matrix, &x_view.matrix, 1.0f, &dest.matrix);
 }
 
 #if USE_MULTITHREADING
 
-static void maintain_thread_bicubic_row()
+static void maintain_thread_bicubic_row(int thread_index)
 {
     ThreadArgBicubic ta = thread_arg.thread_arg.bicubic;
-    int row;
-    while((row = atomic_fetch_add_explicit(&render_row, 1, memory_order_relaxed)) < ta.res){
-        bicubic_row(ta.matrices, ta.s, ta.big, ta.res, ta.offset, row);
+    int square;
+    while((square = atomic_fetch_add_explicit(&render_square, 1, memory_order_relaxed)) < SQUARE(ta.s + 2 * ta.offset - 1)){
+        bicubic_square(ta.storage + 3 * thread_index, ta.matrices, ta.s, ta.big, ta.res, ta.offset, square);
     }
 }
 
@@ -231,9 +268,18 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
             ); // dest = 1.0 * tmp * constmat^T + 0.0 * dest;
         }
     }
+    
+    int max_res = ceilf((float)res / (offset ? s : s - 1));
+    
 #if USE_MULTITHREADING
+    float *storage[3*THREADS];
+    for (int i = 0; i < 3*THREADS; ++i) {
+        storage[i] = (float*)csa_malloc(sizeof(float) * 4 * max_res);
+    }
+    
     thread_arg.task = BICUBIC;
     thread_arg.thread_arg.bicubic = /*(ThreadArgBicubic)*/{
+        storage,
         matrices,
         big,
         s,
@@ -242,9 +288,22 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
     };
 
     launch_render();
+    
+    for(int i = 0; i < 3*THREADS; ++i) {
+        csa_free(storage[i]);
+    }
 #else
-    for(int y = 0; y < res; ++y){
-        bicubic_row(matrices, s, big, res, offset, y);
+    float *storage[3];
+    for (int i = 0; i < 3; ++i) {
+        storage[i] = (float*)csa_malloc(sizeof(float) * 4 * max_res);
+    }
+    
+    for(int square = 0; square < size * size; ++square){
+        bicubic_square(storage, matrices, s, big, res, offset, square);
+    }
+    
+    for(int i = 0; i < 3; ++i) {
+        csa_free(storage[i]);
     }
 #endif
 
@@ -334,11 +393,11 @@ static void composite_row(Tracker *tracker, MapLayerColourMapping *mappings, int
 
 #if USE_MULTITHREADING
 
-static void maintain_thread_composite_row()
+static void maintain_thread_composite_row(__attribute__((unused)) int thread_index)
 {
     ThreadArgComposite ta = thread_arg.thread_arg.composite;
     int row;
-    while((row = atomic_fetch_add_explicit(&render_row, 1, memory_order_relaxed)) < ta.res){
+    while((row = atomic_fetch_add_explicit(&render_square, 1, memory_order_relaxed)) < ta.res){
         composite_row(ta.tracker, ta.mappings, ta.res, ta.stride, ta.layerCount, ta.layerSize, row);
     }
 }
@@ -368,16 +427,16 @@ void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int s
 
 #if USE_MULTITHREADING
 
-__attribute__((noreturn)) static void* maintain_thread_generic(__attribute__((unused)) void *data)
+__attribute__((noreturn)) static void* maintain_thread_generic(void *data)
 {
     while(1){
         sem_wait(&start_semaphore); // wait to be told to start
         switch(thread_arg.task) {
             case BICUBIC:
-                maintain_thread_bicubic_row();
+                maintain_thread_bicubic_row((int)(intptr_t)data);
                 break;
             case COMPOSITE:
-                maintain_thread_composite_row();
+                maintain_thread_composite_row((int)(intptr_t)data);
                 break;
             default:
                 csa_error("invalid value of 'thread_arg.task'. (Expected one of BICUBIC, COMPOSITE)\n");
@@ -401,7 +460,7 @@ void init_accelerate()
     
     pthread_t threads[THREADS];
     for(int t = 0; t < THREADS; ++t){
-        pthread_create(threads + t, NULL, maintain_thread_generic, NULL);
+        pthread_create(threads + t, NULL, maintain_thread_generic, (void*)(intptr_t)t);
     }
 #endif
 }

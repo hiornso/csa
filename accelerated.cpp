@@ -466,20 +466,25 @@ __attribute__((noreturn)) static void* maintain_thread_generic(void *data)
 
 #endif
 
-void init_accelerate()
+int init_accelerate()
 {
 #if OPENBLAS
     openblas_set_num_threads(1);
 #endif
 
 #if USE_MULTITHREADING
-    sem_init(&rendering_semaphore, 0, 1);
-    sem_init(&start_semaphore, 0, 0);
-    sem_init(&stop_semaphore, 0, 0);
+    if (sem_init(&rendering_semaphore, 0, 1) ||
+        sem_init(&start_semaphore, 0, 0) ||
+        sem_init(&stop_semaphore, 0, 0)
+    ) {        
+        return -1;
+    }
     
     pthread_t threads[THREADS];
     for(int t = 0; t < THREADS; ++t){
         pthread_create(threads + t, NULL, maintain_thread_generic, (void*)(intptr_t)t);
     }
 #endif
+    
+    return 0;
 }

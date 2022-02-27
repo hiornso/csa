@@ -42,10 +42,12 @@ static volatile long long int free_total_size = 0;
 static sem_t threadlock;
 #endif
 
-void csa_init_alloc_tracker(void) {
+int csa_init_alloc_tracker(void) {
 #if DEBUG
-	sem_init(&threadlock, 0, 1);
+	if (sem_init(&threadlock, 0, 1)) return -1;
 #endif
+	
+	return 0;
 }
 
 void csa_alloc_print_report(void)

@@ -33,8 +33,10 @@ void update_window_title(__attribute__ ((unused)) Omni *data) {}
 
 int main()
 {
-	csa_init_alloc_tracker();
-	init_accelerate();
+	if (csa_init_alloc_tracker() || init_accelerate()) {
+		csa_error("failed to initialise sempahores for multithreading.\n");
+		return -1;
+	}
 	
 	gtk_init();
 	GtkWidget *dummy = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);

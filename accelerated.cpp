@@ -217,7 +217,7 @@ static void bicubic_square(float **storage, const BicubicMatrix *matrices, const
 
 #if USE_MULTITHREADING
 
-static void maintain_thread_bicubic_row(int thread_index)
+static void maintain_thread_bicubic_square(int thread_index)
 {
     ThreadArgBicubic ta = thread_arg.thread_arg.bicubic;
     int square;
@@ -452,7 +452,7 @@ __attribute__((noreturn)) static void* maintain_thread_generic(void *data)
         
         switch(thread_arg.task) {
             case BICUBIC:
-                maintain_thread_bicubic_row((int)(intptr_t)data);
+                maintain_thread_bicubic_square((int)(intptr_t)data);
                 break;
             case COMPOSITE:
                 maintain_thread_composite_row((int)(intptr_t)data);

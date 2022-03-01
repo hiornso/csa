@@ -3,8 +3,15 @@ CXX ?= c++
 
 PKGCONFIG ?= pkg-config
 
+OS ?= $(shell uname)
+
 USE_VCL ?= 0
 USE_LTO ?= 0
+ifeq ($(OS),Darwin)
+ACCELERATE ?= 1
+else
+ACCELERATE ?= 0
+endif
 OPENBLAS ?= 1
 DEBUGINFO ?= 1
 
@@ -33,7 +40,10 @@ CXXFLAGS += $(CFLAGS) -std=$(CXXSTD)
 LDLIBS += `$(PKGCONFIG) --libs gtk4 luajit`
 LDLIBS += -lpthread -lm -lgsl
 
-ifeq ($(OPENBLAS),1)
+ifeq ($(ACCELERATE),1)
+CXX += -DACCELERATE_FRAMEWORK=1
+LDLIBS += -framework Accelerate
+else ifeq ($(OPENBLAS),1)
 CXXFLAGS += -DOPENBLAS=1
 LDLIBS += -lopenblas
 else
@@ -42,8 +52,6 @@ LDLIBS += -lcblas
 endif
 
 BUILD_DIR ?= build
-
-OS ?= $(shell uname)
 
 OSDEPS ?= osdeps
 DARWINDEPS ?= darwindeps

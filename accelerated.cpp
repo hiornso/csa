@@ -522,6 +522,9 @@ static int destroy_mutexes(bool free_render_lock, size_t free_subthread_lock_run
 
 int init_accelerate()
 {
+#if ACCELERATE_FRAMEWORK
+    setenv("VECLIB_MAXIMUM_THREADS", "1", 0);
+#endif
 #if OPENBLAS
     openblas_set_num_threads(1);
 #endif

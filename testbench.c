@@ -34,7 +34,7 @@ void update_window_title(__attribute__ ((unused)) Omni *data) {}
 int main()
 {
 	if (csa_init_alloc_tracker() || init_accelerate()) {
-		csa_error("failed to initialise sempahores for multithreading.\n");
+		csa_error("failed to initialise testbench.\n");
 		return -1;
 	}
 	
@@ -80,6 +80,14 @@ int main()
 	
 	cairo_surface_destroy(surface);
 	cairo_destroy(cr);
+	
+	int deinit_status;
+	if ((deinit_status = deinit_accelerate())) {
+		csa_error("failed to properly de-initialise rendering acceleration subsystem. (%i errors)\n", -deinit_status);
+	}
+	if ((deinit_status = csa_deinit_alloc_tracker())) {
+		csa_error("failed to properly de-initialise memory allocation subsystem.\n");
+	}
 	
 	return 0;
 }

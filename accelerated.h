@@ -12,6 +12,7 @@ extern "C" {
 int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset);
 void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int stride, int layerCount, int layerSize);
 int init_accelerate();
+int deinit_accelerate();
 
 #ifdef __cplusplus
 }

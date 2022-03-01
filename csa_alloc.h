@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 int csa_init_alloc_tracker(void);
+int csa_deinit_alloc_tracker(void);
 void csa_alloc_print_report(void);
 void *_csa_calloc(const char *alloc_info, size_t nitems, size_t size);
 void *_csa_malloc(const char *alloc_info, size_t size);

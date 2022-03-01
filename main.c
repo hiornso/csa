@@ -1378,8 +1378,13 @@ static int handle_local_cmdline_args(__attribute__ ((unused)) GApplication *appl
 
 int main(int argc, char *argv[])
 {
-	if (csa_init_alloc_tracker() || init_accelerate()) {
-		csa_error("failed to initialise semaphores for synchronisation of threads.\n");
+	if (csa_init_alloc_tracker()) {
+		csa_error("failed to initialise memory allocation subsystem: aborting.\n");
+		return -1;
+	} 
+	if (init_accelerate()) {
+		csa_error("failed to initialise rendering acceleration subsystem: aborting.\n");
+		return -2;
 	}
 	
 	GtkApplication *app = gtk_application_new(CSA_APPLICATION_ID, G_APPLICATION_HANDLES_COMMAND_LINE);
@@ -1436,6 +1441,14 @@ int main(int argc, char *argv[])
 	int status = g_application_run(G_APPLICATION (app), argc, argv);
 	
 	g_object_unref(app);
+	
+	int deinit_status;
+	if ((deinit_status = deinit_accelerate())) {
+		csa_error("failed to properly de-initialise rendering acceleration subsystem. (%i errors)\n", -deinit_status);
+	}
+	if ((deinit_status = csa_deinit_alloc_tracker())) {
+		csa_error("failed to properly de-initialise memory allocation subsystem.\n");
+	}
 	
 	csa_alloc_print_report();
 	

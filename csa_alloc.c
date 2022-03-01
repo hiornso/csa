@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <semaphore.h>
+#include <pthread.h>
+#include <string.h>
 
 #include "csa_alloc.h"
 #include "csa_error.h"
@@ -39,12 +40,28 @@ static volatile int free_count = 0;
 static volatile long long int free_total_size = 0;
 #endif
 
-static sem_t threadlock;
+static pthread_mutex_t threadlock;
 #endif
 
 int csa_init_alloc_tracker(void) {
 #if DEBUG
-	if (sem_init(&threadlock, 0, 1)) return -1;
+	int status;
+	if ((status = pthread_mutex_init(&threadlock, NULL))) {
+        csa_error("failed to initialise 'threadlock' mutex: %s\n", strerror(status));
+		return -1;
+	}
+#endif
+	
+	return 0;
+}
+
+int csa_deinit_alloc_tracker(void) {
+#if DEBUG
+	int status;
+	if ((status = pthread_mutex_destroy(&threadlock))) {
+        csa_error("failed to deallocate 'threadlock' mutex: %s\n", strerror(status));
+		return -1;
+	}
 #endif
 	
 	return 0;
@@ -83,7 +100,7 @@ void csa_alloc_print_report(void)
 #if DEBUG
 static void log_alloc(void *ptr, const char *msg, size_t size)
 {
-	sem_wait(&threadlock);
+	pthread_mutex_lock(&threadlock);
 	
 #if RECORD_ALLOC_COUNT_AND_SIZE
 	++alloc_count;
@@ -102,7 +119,7 @@ static void log_alloc(void *ptr, const char *msg, size_t size)
 		}
 	}
 	if(found){
-		sem_post(&threadlock);
+		pthread_mutex_unlock(&threadlock);
 		return;
 	}
 	
@@ -114,7 +131,7 @@ static void log_alloc(void *ptr, const char *msg, size_t size)
 	}
 	allocs[n_allocs - 1] = (AllocInfo){ptr, msg, size, 0};
 	
-	sem_post(&threadlock);
+	pthread_mutex_unlock(&threadlock);
 }
 #endif
 
@@ -151,7 +168,7 @@ void csa_free(void *ptr)
 #if DEBUG
 	if(ptr == NULL) return;
 	
-	sem_wait(&threadlock);
+	pthread_mutex_lock(&threadlock);
 	
 #if RECORD_ALLOC_COUNT_AND_SIZE
 	++free_count;
@@ -186,7 +203,7 @@ void csa_free(void *ptr)
 		csa_error("POINTER %p WAS NOT FOUND IN 'allocs' ARRAY!\n", ptr);
 	}
 	
-	sem_post(&threadlock);
+	pthread_mutex_unlock(&threadlock);
 #endif
 	free(ptr);
 }

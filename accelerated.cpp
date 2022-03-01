@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdatomic.h>
-#include <semaphore.h>
 #include <math.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <string.h>
 
 #define HAVE_INLINE 1 // use inlines for GSL where possible
 
@@ -35,6 +36,11 @@ extern "C" {
 
 #if USE_MULTITHREADING
 #include <pthread.h>
+
+pthread_t threads[THREADS];
+pthread_mutex_t render_lock;
+pthread_mutex_t subthread_lock_run[THREADS];
+pthread_mutex_t subthread_lock_done[THREADS];
 #endif
 
 #if USE_VECTORS
@@ -86,6 +92,7 @@ typedef struct thread_arg_composite {
 } ThreadArgComposite;
 
 enum thread_task {
+    EXIT_THREAD,
     BICUBIC,
     COMPOSITE,
 };
@@ -99,27 +106,23 @@ typedef struct thread_arg_generic {
 } ThreadArg;
 
 static atomic_char32_t render_square;
-static sem_t rendering_semaphore, start_semaphore, stop_semaphore;
 static ThreadArg thread_arg;
 
-static void launch_render(ThreadArg ta)
+static void launch_render(ThreadArg ta, int nthreads)
 {
-    sem_wait(&rendering_semaphore); // wait for any other rendering processes to finish
+    pthread_mutex_lock(&render_lock); // wait for any other rendering processes to finish
     
     thread_arg = ta;
     atomic_thread_fence(memory_order_release);
     
     atomic_init(&render_square, 0);
     
-    for(int i = 0; i < THREADS; ++i) {
-        sem_post(&start_semaphore); // send a start rendering message to each thread
-    }
+    for(int i = 0; i < nthreads; ++i) pthread_mutex_unlock(&subthread_lock_run[i]); // send a start rendering message to each thread
+    for(int i = 0; i < nthreads; ++i) pthread_mutex_lock(&subthread_lock_done[i]);
+    for(int i = 0; i < nthreads; ++i) pthread_mutex_lock(&subthread_lock_run[i]); // wait for all threads to finish rendering
+    for(int i = 0; i < nthreads; ++i) pthread_mutex_unlock(&subthread_lock_done[i]);
     
-    for(int i = 0; i < THREADS; ++i) {
-        sem_wait(&stop_semaphore); // wait for all threads to finish rendering
-    }
-    
-    sem_post(&rendering_semaphore); // mark that rendering is finished
+    pthread_mutex_unlock(&render_lock); // mark that rendering is finished
 }
 
 #endif
@@ -297,7 +300,7 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
         offset
     };
     
-    launch_render(ta);
+    launch_render(ta, THREADS);
     
     for(int i = 0; i < 3*THREADS; ++i) {
         csa_free(storage[i]);
@@ -434,7 +437,7 @@ void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int s
         layerSize
     };
     
-    launch_render(ta);
+    launch_render(ta, THREADS);
 #else
     for(int y = 0; y < res; ++y){
         composite_row(tracker, mappings, res, stride, layerCount, layerSize, y);
@@ -446,22 +449,73 @@ void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int s
 
 __attribute__((noreturn)) static void* maintain_thread_generic(void *data)
 {
+    const int thread_index = (int)(intptr_t)data;
+    pthread_mutex_lock(&subthread_lock_done[thread_index]);
     while(1){
-        sem_wait(&start_semaphore); // wait to be told to start
+        pthread_mutex_lock(&subthread_lock_run[thread_index]); // wait to be told to start
+        pthread_mutex_unlock(&subthread_lock_done[thread_index]);
         atomic_thread_fence(memory_order_acquire); // get updates to thread_arg
         
         switch(thread_arg.task) {
+            case EXIT_THREAD:
+                pthread_mutex_unlock(&subthread_lock_run[thread_index]);
+                pthread_exit(0);
             case BICUBIC:
-                maintain_thread_bicubic_square((int)(intptr_t)data);
+                maintain_thread_bicubic_square(thread_index);
                 break;
             case COMPOSITE:
-                maintain_thread_composite_row((int)(intptr_t)data);
+                maintain_thread_composite_row(thread_index);
                 break;
             default:
                 csa_error("invalid value of 'thread_arg.task'. (Expected one of BICUBIC, COMPOSITE)\n");
         }
-        sem_post(&stop_semaphore); // inform the main thread that rendering is done
+        
+        pthread_mutex_unlock(&subthread_lock_run[thread_index]); // inform the main thread that rendering is done
+        pthread_mutex_lock(&subthread_lock_done[thread_index]);
     }
+}
+
+static int destroy_threads(int nthreads)
+{
+    ThreadArg ta;
+    ta.task = EXIT_THREAD;
+    
+    launch_render(ta, nthreads);
+    
+    for (int i = 0; i < nthreads; ++i) {
+        pthread_mutex_unlock(&subthread_lock_run[i]);
+    }
+    
+    for (int i = 0; i < nthreads; ++i) {
+        pthread_join(threads[i], NULL);
+    }
+    
+    return 0;
+}
+
+static int destroy_mutexes(bool free_render_lock, size_t free_subthread_lock_run, size_t free_subthread_lock_done)
+{
+    int status;
+    int ret = 0;
+    if (free_render_lock) {
+        if ((status = pthread_mutex_destroy(&render_lock))) {
+            csa_error("failed to deallocate 'render_lock' mutex: %s\n", strerror(status));
+            --ret;
+        }
+    }
+    for (size_t i = 0; i < free_subthread_lock_run; ++i) {
+        if ((status = pthread_mutex_destroy(&subthread_lock_run[i]))) {
+            csa_error("failed to deallocate 'subthread_lock_run[%i]' mutex: %s\n", i, strerror(status));
+            --ret;
+        }
+    }
+    for (size_t i = 0; i < free_subthread_lock_done; ++i) {
+        if ((status = pthread_mutex_destroy(&subthread_lock_done[i]))) {
+            csa_error("failed to deinitialise 'subthread_lock_done[%i]' mutex: %s\n", i, strerror(status));
+            --ret;
+        }
+    }
+    return ret;
 }
 
 #endif
@@ -473,18 +527,45 @@ int init_accelerate()
 #endif
 
 #if USE_MULTITHREADING
-    if (sem_init(&rendering_semaphore, 0, 1) ||
-        sem_init(&start_semaphore, 0, 0) ||
-        sem_init(&stop_semaphore, 0, 0)
-    ) {        
+    int status;
+    if ((status = pthread_mutex_init(&render_lock, NULL))) {
+        csa_error("failed to initialise 'render_lock' mutex: %s\n", strerror(status));
+        destroy_mutexes(true, 0, 0);
         return -1;
     }
+    for (int i = 0; i < THREADS; ++i) {
+        if ((status = pthread_mutex_init(&subthread_lock_done[i], NULL))) {
+            csa_error("failed to initialise 'subthread_lock_done[%i]' mutex: %s\n", i, strerror(status));
+            destroy_mutexes(true, i, i);
+            return -2;
+        }
+        if ((status = pthread_mutex_init(&subthread_lock_run[i],  NULL))) {
+            csa_error("failed to initialise 'subthread_lock_run[%i]' mutex: %s\n", i, strerror(status));
+            destroy_mutexes(true, i + 1, i);
+            return -3;
+        }
+    }
     
-    pthread_t threads[THREADS];
     for(int t = 0; t < THREADS; ++t){
-        pthread_create(threads + t, NULL, maintain_thread_generic, (void*)(intptr_t)t);
+        pthread_mutex_lock(&subthread_lock_run[t]);
+        if ((status = pthread_create(&threads[t], NULL, maintain_thread_generic, (void*)(intptr_t)t))) {
+            csa_error("failed to create thread (thread index %i): %s\n", t, strerror(status));
+            destroy_threads(t);
+            destroy_mutexes(true, THREADS, THREADS);
+            return -4;
+        }
     }
 #endif
     
     return 0;
+}
+
+int deinit_accelerate()
+{
+    int status = 0;
+#if MULTITHREADING
+    status += destroy_threads(THREADS);
+    status += destroy_mutexes(true, THREADS, THREADS);
+#endif
+    return status;
 }

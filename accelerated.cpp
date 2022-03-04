@@ -32,6 +32,8 @@ extern "C" {
 #define THREADS 8
 #define VECSIZE 8
 
+#define DISABLE_BICUBIC 0
+#define DISABLE_COMPOSITE 0
 
 #if USE_MULTITHREADING
 #include <pthread.h>
@@ -232,6 +234,8 @@ static void maintain_thread_bicubic_square(int thread_index)
 
 int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset)
 {
+#if !DISABLE_BICUBIC
+
     offset = offset ? 1 : 0;
     const int size = s + 2 * offset - 1;
     BicubicMatrix *matrices = (BicubicMatrix*)csa_calloc(size * size, sizeof(BicubicMatrix)); // could cache this, but probably not worth it - not a hot loop, and would increase memory usage a bit, so why bother
@@ -326,6 +330,8 @@ int32_t bicubic(float *small, int32_t s, float *big, int32_t res, int32_t offset
 #endif
 
     csa_free(matrices);
+
+#endif
 	
 	return 0;
 }
@@ -424,6 +430,8 @@ static void maintain_thread_composite_row(__attribute__((unused)) int thread_ind
 
 void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int stride, int layerCount, int layerSize)
 {
+#if !DISABLE_COMPOSITE
+
 #if USE_MULTITHREADING
     ThreadArg ta;
     ta.task = COMPOSITE;
@@ -441,6 +449,8 @@ void composite(Tracker *tracker, MapLayerColourMapping *mappings, int res, int s
     for(int y = 0; y < res; ++y){
         composite_row(tracker, mappings, res, stride, layerCount, layerSize, y);
     }
+#endif
+
 #endif
 }
 

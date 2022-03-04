@@ -31,7 +31,6 @@ extern "C" {
 
 #define THREADS 8
 #define VECSIZE 8
-#define USE_LOADSTORE 0
 
 
 #if USE_MULTITHREADING

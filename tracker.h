@@ -67,7 +67,7 @@ typedef struct map_render_cache {
 	float *map_pixels;
 	float *map_subpixels;
 	
-    unsigned char *pixels;
+	unsigned char *pixels;
 	
 	float *vals;
 	

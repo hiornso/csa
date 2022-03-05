@@ -139,8 +139,8 @@ static Tracker* new_tracker(const char *lua_map_script, const char mode)
 	}
 	
 	t->mrc.old_res = -1;
-    
-    t->mrc.clen = 0;
+	
+	t->mrc.clen = 0;
 	t->mrc.rlen = 0;
 	
 	t->mrc.map_pixels = NULL;

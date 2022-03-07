@@ -7,7 +7,10 @@
 #include "csa_error.h"
 
 #define SQUARE(x) ((x)*(x))
+
+#ifndef M_PI
 #define M_PI 3.14159265358979323846
+#endif
 
 #define NO_CACHE_MAP (0)
 #define TEXTSIZE (15)

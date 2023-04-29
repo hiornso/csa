@@ -1361,7 +1361,7 @@ static int handle_local_cmdline_args(__attribute__ ((unused)) GApplication *appl
 			"\033[1;34m\tb\033[0m: \033[1;33mload built-in map\033[0m\n"
 			"For example:\n"
 			"\t\033[32mcsa \033[33m-f \033[1m\"n b f f f n\" \033[34mAlpha ~/map.lua ~/map2.lua ~/mysave.csa\033[0m\n"
-			"creates an empty window, a window with the inbuilt \033[34mAlpha\033[0m map loaded, a window with"
+			"creates an empty window, a window with the inbuilt \033[34mAlpha\033[0m map loaded, a window with "
 			"\033[34m~/map.lua\033[0m loaded, a window with \033[34m~/map2.lua\033[0m loaded, a window "
 			"into which \033[34m~/mysave.csa\033[0m is loaded and another empty window.\n";
 		line_wrap(formatters_description);

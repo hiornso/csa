@@ -57,6 +57,8 @@ int csa_init_alloc_tracker(void) {
 
 int csa_deinit_alloc_tracker(void) {
 #if DEBUG
+	free((void*)allocs);
+
 	int status;
 	if ((status = pthread_mutex_destroy(&threadlock))) {
         csa_error("failed to deallocate 'threadlock' mutex: %s\n", strerror(status));
